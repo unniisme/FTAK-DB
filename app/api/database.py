@@ -3,7 +3,7 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy.sql import text
 
 
-# DB functions
+# Database Connection
 class PostgresqlDB:
     def __init__(self,user_name,password,host,port,db_name):
         """
@@ -78,4 +78,108 @@ class PostgresqlDB:
             print(f'Failed to execute ddl and dml commands -- {err}')
 
 
-    ## Functions here for returning db outputs in a manner accessable by front end.
+class FTAKdb(PostgresqlDB):
+    """
+    Queries for the ftak database
+    """
+
+    #Type functions
+    def dql_output_to_dictList(dql_output):
+        results = []
+        for entry in [x for x in dql_output]:
+            results.append({key : val for val, key in (zip(entry, dql_output.keys()))})
+        return results
+
+    def dql_to_dictList(self, query):
+        result = self.execute_dql_commands(query)
+        return FTAKdb.dql_output_to_dictList(result)
+
+    def print_dql(self, query):
+        result = self.execute_dql_commands(query)
+
+        [print('|\t', column, '\t|', end="") for column in result.keys()]
+        print("")
+        for row in result:
+            [print('|\t', entry, '\t|', end="") for entry in row]
+            print("")
+    
+
+
+
+    def __init__(self,user_name,password,host,port):
+        # Initialise parent class using database 'ftak'
+        super().__init__(user_name, password, host, port, 'ftak')
+
+    # DQ
+    def get_farmer_by_id(self, id):
+        query = f"SELECT * FROM farmer \
+            WHERE farmer_id = {id};"
+        
+        return self.dql_to_dictList(query)
+
+    def get_countries(self):
+        query = "SELECT * FROM country;"
+
+        return self.dql_to_dictList(query)
+
+    def get_citied_from_country_name(self, name):
+        query = f"SELECT city_id, city.name \
+            FROM city, country \
+            WHERE city.country_id = country.country_id AND city.name = {name};"
+
+        return self.dql_to_dictList(query)
+
+    # DD DM
+    def insert_farmer(self, first_name, last_name, DoB, DoJ, phone_number, address_id):
+        query = f"INSERT INTO farmer(first_name, last_name, DoB, DoJ, phone_number, address_id) \
+            VALUES ('{first_name}', '{last_name}', '{DoB}', '{DoJ}', {phone_number}, {address_id})"
+
+        self.execute_ddl_and_dml_commands(query)
+
+    def insert_address(self, country, city=None, street_name=None, street_number=None, postal_code=None):
+        if city==None or len(self.dql_to_dictList(f"SELECT * FROM country WHERE name={country}")) == 0:
+            if len(self.dql_to_dictList(f"SELECT * FROM country WHERE name={country}")) > 0:
+                print("Country",country, "already present")
+                return -1
+
+            query = f"INSERT INTO country(name) VALUES({country})"
+            self.execute_ddl_and_dml_commands(query)
+            print("Inserted country", country)
+
+            if city == None:
+                return 0
+
+        country_id = self.dql_to_dictList(f"SELECT * FROM country WHERE name = {country}")[0]['country_id']
+
+            
+        if street_name==None or len(self.dql_to_dictList(f"SELECT * FROM city WHERE name={city}")) == 0:
+            if len(self.dql_to_dictList(f"SELECT * FROM city WHERE name={city}")) > 0:
+                print("City", city, "already present")
+                return -1
+
+            query = f"INSERT INTO city(name, country_id) VALUES({city}, {country_id})"
+            self.execute_ddl_and_dml_commands(query)
+            print("Inserted city", city)
+
+            if street_name == None:
+                return 0
+
+        city_id = self.dql_to_dictList(f"SELECT * FROM city WHERE name = {city}")[0]['city_id']
+
+        street_number = "NULL" if street_number==None else street_number
+        postal_code = "NULL" if postal_code==None else postal_code
+
+        query = f"INSERT INTO address(city_id, country_id, street_name, street_number, postal_code)\
+            VALUES ({city_id}, {country_id}, '{street_name}', '{street_number}', '{postal_code}')"
+        
+        self.execute_ddl_and_dml_commands(query)
+        print("Inserted address")
+
+        
+
+
+        
+
+
+        
+        
