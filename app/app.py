@@ -1,5 +1,5 @@
 from flask import Flask
-from api.database import PostgresqlDB
+from api.database import FTAKdb
 
 app = Flask(__name__)
 
@@ -8,18 +8,20 @@ app = Flask(__name__)
 USER_NAME = 'postgres'
 PASSWORD = 'postgres'
 PORT = 5432
-DATABASE_NAME = 'ftak'  #Created via psql
 HOST = 'localhost'
 
 #Initializing SqlAlchemy Postgresql Db Instance
-db = PostgresqlDB(user_name=USER_NAME,
+db = FTAKdb(user_name=USER_NAME,
                     password=PASSWORD,
-                    host=HOST,port=PORT,
-                    db_name=DATABASE_NAME)
+                    host=HOST,port=PORT)
 
 @app.route('/')
 def home():
     return 'Connected'
+
+@app.route('/<farmer_id>')
+def getFarmer(farmer_id):
+    return str(db.get_farmer_by_id(farmer_id))
 
 if __name__ == '__main__':
     app.run()
