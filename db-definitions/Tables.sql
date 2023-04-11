@@ -1,0 +1,2 @@
+-- Table definitions
+-- DB name is ftak
