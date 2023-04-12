@@ -97,12 +97,16 @@ class FTAKdb(PostgresqlDB):
     def print_dql(self, query):
         result = self.execute_dql_commands(query)
 
-        [print('|\t', column, '\t|', end="") for column in result.keys()]
+        [print("| {:^20} |".format(column), end="") for column in result.keys()]
         print("")
         for row in result:
-            [print('|\t', entry, '\t|', end="") for entry in row]
+            [print("| {:^20} |".format(entry), end="") for entry in row]
             print("")
-    
+
+        print()
+
+    def print_table(self, table):
+        self.print_dql(f"SELECT * FROM {table}") 
 
 
 
@@ -135,36 +139,37 @@ class FTAKdb(PostgresqlDB):
             VALUES ('{first_name}', '{last_name}', '{DoB}', '{DoJ}', {phone_number}, {address_id})"
 
         self.execute_ddl_and_dml_commands(query)
+        print("Inserted farmer")
 
     def insert_address(self, country, city=None, street_name=None, street_number=None, postal_code=None):
-        if city==None or len(self.dql_to_dictList(f"SELECT * FROM country WHERE name={country}")) == 0:
-            if len(self.dql_to_dictList(f"SELECT * FROM country WHERE name={country}")) > 0:
+        if city==None or len(self.dql_to_dictList(f"SELECT * FROM country WHERE name='{country}'")) == 0:
+            if len(self.dql_to_dictList(f"SELECT * FROM country WHERE name='{country}'")) > 0:
                 print("Country",country, "already present")
                 return -1
 
-            query = f"INSERT INTO country(name) VALUES({country})"
+            query = f"INSERT INTO country(name) VALUES('{country}')"
             self.execute_ddl_and_dml_commands(query)
             print("Inserted country", country)
 
             if city == None:
                 return 0
 
-        country_id = self.dql_to_dictList(f"SELECT * FROM country WHERE name = {country}")[0]['country_id']
+        country_id = self.dql_to_dictList(f"SELECT * FROM country WHERE name = '{country}'")[0]['country_id']
 
             
-        if street_name==None or len(self.dql_to_dictList(f"SELECT * FROM city WHERE name={city}")) == 0:
-            if len(self.dql_to_dictList(f"SELECT * FROM city WHERE name={city}")) > 0:
+        if street_name==None or len(self.dql_to_dictList(f"SELECT * FROM city WHERE name='{city}'")) == 0:
+            if len(self.dql_to_dictList(f"SELECT * FROM city WHERE name='{city}'")) > 0:
                 print("City", city, "already present")
                 return -1
 
-            query = f"INSERT INTO city(name, country_id) VALUES({city}, {country_id})"
+            query = f"INSERT INTO city(name, country_id) VALUES('{city}', {country_id})"
             self.execute_ddl_and_dml_commands(query)
             print("Inserted city", city)
 
             if street_name == None:
                 return 0
 
-        city_id = self.dql_to_dictList(f"SELECT * FROM city WHERE name = {city}")[0]['city_id']
+        city_id = self.dql_to_dictList(f"SELECT * FROM city WHERE name = '{city}'")[0]['city_id']
 
         street_number = "NULL" if street_number==None else street_number
         postal_code = "NULL" if postal_code==None else postal_code
@@ -174,12 +179,3 @@ class FTAKdb(PostgresqlDB):
         
         self.execute_ddl_and_dml_commands(query)
         print("Inserted address")
-
-        
-
-
-        
-
-
-        
-        
