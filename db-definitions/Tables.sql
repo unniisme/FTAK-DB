@@ -105,3 +105,12 @@ ALTER TABLE trade ADD CONSTRAINT pr_fk FOREIGN KEY (rate) REFERENCES product (ra
 ALTER TABLE address ADD CONSTRAINT city_fk FOREIGN KEY (city_id) REFERENCES city (city_id);
 ALTER TABLE address ADD CONSTRAINT country_fk FOREIGN KEY (country_id) REFERENCES country (country_id);
 ALTER TABLE city ADD CONSTRAINT country_fk FOREIGN KEY (country_id) REFERENCES country (country_id);
+
+
+-- Logins
+CREATE TABLE farmer_login (
+  username VARCHAR(100) PRIMARY KEY,
+  farmer_id INT NOT NULL,
+
+  FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id)
+);

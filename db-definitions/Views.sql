@@ -3,6 +3,7 @@
 --Create users
 CREATE USER Farmer;
 CREATE USER Supervisor;
+CREATE USER Customer;
 
 --Create views for Farmer
 CREATE VIEW farmer_info AS
@@ -41,3 +42,6 @@ JOIN country ON address.country_id = country.country_id;
 
 GRANT SELECT ON full_trade_data TO Supervisor;
 GRANT SELECT ON farmer_depot_info TO Supervisor;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO supervisor;
+REVOKE INSERT, UPDATE, DELETE ON trade FROM supervisor;
