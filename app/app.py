@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template, request
 from api.database import FTAKdb
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ db = FTAKdb(user_name=USER_NAME,
 
 @app.route('/')
 def home():
-    return 'Connected'
+    return render_template('home.html')
 
 @app.route('/<farmer_id>')
 def getFarmer(farmer_id):
