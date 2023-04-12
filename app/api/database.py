@@ -187,6 +187,18 @@ class FTAKdb(PostgresqlDB):
 
     
     # Roles and logins
+    def farmer_login(username, password, host, port):
+        db = FTAKdb(admin_username, admin_password, host, port)
+        if (len(db.dql_to_dictList(f"SELECT * FROM farmer_login WHERE username='{username}'")) == 0):
+            return None
+        
+        db = FTAKdb(username, password, host, port)
+        if db.execute_dql_commands("SELECT * FROM address") == None:
+            return None
+
+        return db
+
+
     def farmer_sign_up(self, username, password, first_name, last_name, DoB, DoJ, phone_number, address_id):
         try:
             if len(self.dql_to_dictList(f"SELECT * FROM farmer_login WHERE username='{username}'")) != 0:
@@ -199,12 +211,12 @@ class FTAKdb(PostgresqlDB):
 
             new_farmer_id = self.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
             farmer_login_query = f"INSERT INTO farmer_login VALUES('{username}', {new_farmer_id})"
+            self.execute_ddl_and_dml_commands(farmer_login_query)
             print("Created farmer")
 
             view_query=f"CREATE VIEW {username}_farmer_info AS \
                 SELECT * FROM farmer NATURAL JOIN farmer_product NATURAL JOIN farmer_plot NATURAL JOIN farmer_depot \
                 WHERE farmer_id={new_farmer_id}"
-            print(view_query)
             self.execute_ddl_and_dml_commands(view_query)
             print("Created view")
 

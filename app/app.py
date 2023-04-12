@@ -32,9 +32,18 @@ def home():
 
 @app.route('/farmerlogin', methods=['POST','GET'])
 def farmerlogin():
+    global db
+
     if 'username' in request.form:
         username = request.form['username']
         password = request.form['password']
+
+        db = FTAKdb.farmer_login(username, password, HOST, PORT)
+        if db==None:
+            print("Unknown username or password")
+        else:
+            return redirect(url_for('farmer'))
+
 
     return render_template('login.html',role = 'farmer')
     
@@ -55,11 +64,11 @@ def customerlogin():
         password = request.form['password']
 
     return render_template('login.html',role = 'customer')
-    
 
-@app.route('/<farmer_id>')
-def getFarmer(farmer_id):
-    return str(db.get_farmer_by_id(farmer_id))
+@app.route('/farmer')
+def farmer():
+    return "Logged in as " + db.user_name 
+    
 
 if __name__ == '__main__':
     app.run()
