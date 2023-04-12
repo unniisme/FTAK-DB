@@ -7,7 +7,7 @@ body{
     display:flex;
     flex-direction: column;
     text-decoration-color:white;
-    background-color: aquamarine;
+    background-color: rgb(155, 188, 189);
     text-align: center;
     margin: 0 0 100px;
   }
@@ -24,4 +24,11 @@ body{
     overflow-x: auto;
     font-family: 'Poppins'; 
 
+  }
+  .heading{
+    font-size: 40px;
+    padding: 7px 7px;
+    color:#ffffff;
+    font-family: 'Lobster';
+    text-align: center;
   }
