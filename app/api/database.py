@@ -2,6 +2,8 @@ import sqlalchemy
 from sqlalchemy.engine import create_engine
 from sqlalchemy.sql import text
 
+admin_username = "postgres"
+admin_password = "postgres" #Suppose to be hidden
 
 # Database Connection
 class PostgresqlDB:
@@ -117,19 +119,19 @@ class FTAKdb(PostgresqlDB):
     # DQ
     def get_farmer_by_id(self, id):
         query = f"SELECT * FROM farmer \
-            WHERE farmer_id = {id};"
+            WHERE farmer_id = {id}"
         
         return self.dql_to_dictList(query)
 
     def get_countries(self):
-        query = "SELECT * FROM country;"
+        query = "SELECT * FROM country"
 
         return self.dql_to_dictList(query)
 
     def get_citied_from_country_name(self, name):
         query = f"SELECT city_id, city.name \
             FROM city, country \
-            WHERE city.country_id = country.country_id AND city.name = {name};"
+            WHERE city.country_id = country.country_id AND city.name = {name}"
 
         return self.dql_to_dictList(query)
 
@@ -140,6 +142,9 @@ class FTAKdb(PostgresqlDB):
 
         self.execute_ddl_and_dml_commands(query)
         print("Inserted farmer")
+
+        # Return ID
+        return self.dql_to_dictList(f"SELECT farmer_id FROM farmer WHERE first_name='{first_name}' AND last_name='{last_name}' AND phone_number='{phone_number}'")[0]['farmer_id']
 
     def insert_address(self, country, city=None, street_name=None, street_number=None, postal_code=None):
         if city==None or len(self.dql_to_dictList(f"SELECT * FROM country WHERE name='{country}'")) == 0:
@@ -179,3 +184,41 @@ class FTAKdb(PostgresqlDB):
         
         self.execute_ddl_and_dml_commands(query)
         print("Inserted address")
+
+    
+    # Roles and logins
+    def farmer_sign_up(self, username, password, first_name, last_name, DoB, DoJ, phone_number, address_id):
+        try:
+            if len(self.dql_to_dictList(f"SELECT * FROM farmer_login WHERE username='{username}'")) != 0:
+                print("User already exists")
+                return -1
+
+            role_query = f"CREATE ROLE {username} LOGIN PASSWORD '{password}'"
+            self.execute_ddl_and_dml_commands(role_query)
+            print("Created role", username)
+
+            new_farmer_id = self.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
+            farmer_login_query = f"INSERT INTO farmer_login VALUES('{username}', {new_farmer_id})"
+            print("Created farmer")
+
+            view_query=f"CREATE VIEW {username}_farmer_info AS \
+                SELECT * FROM farmer NATURAL JOIN farmer_product NATURAL JOIN farmer_plot NATURAL JOIN farmer_depot \
+                WHERE farmer_id={new_farmer_id}"
+            print(view_query)
+            self.execute_ddl_and_dml_commands(view_query)
+            print("Created view")
+
+            permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
+                GRANT SELECT ON product TO {username}; \
+                GRANT SELECT ON address TO {username}; \
+                GRANT SELECT ON country TO {username}; \
+                GRANT SELECT ON city TO {username}; \
+                GRANT SELECT ON depot TO {username}"
+            self.execute_ddl_and_dml_commands(permissions_query)
+            print("Granted permissions")
+
+        except Exception as e:
+            print(e)
+            return -1
+
+        return 0
