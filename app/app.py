@@ -21,49 +21,34 @@ def home():
         if 'role' in request.form:
             role = request.form['role']
             if role == 'FARMER':
-                return redirect(url_for('farmerlogin'))
+                return redirect(url_for('farmer_login'))
             if role == 'INSPECTOR':
-                return redirect(url_for('inspectorlogin'))
+                return redirect(url_for('inspector_login'))
             if role == 'CUSTOMER':
-                return redirect(url_for('customerlogin'))
+                return redirect(url_for('customer_login'))
             return role
     return render_template('home.html')
 
 
-@app.route('/farmerlogin', methods=['POST','GET'])
-def farmerlogin():
+@app.route('/<client>_login', methods=['POST','GET'])
+def login(client):
     global db
 
     if 'username' in request.form:
         username = request.form['username']
         password = request.form['password']
 
-        db = FTAKdb.farmer_login(username, password, HOST, PORT)
+        if client == "farmer":
+            db = FTAKdb.farmer_login(username, password, HOST, PORT)
+        else:
+            db = FTAKdb(username, password, host, port)
+            
         if db==None:
             print("Unknown username or password")
         else:
-            return redirect(url_for('farmer'))
+            return redirect(url_for(client))
 
-
-    return render_template('login.html',role = 'farmer')
-    
-    
-@app.route('/inspectorlogn', methods=['POST','GET'])
-def inspectorlogin():
-    if 'username' in request.form:
-        username = request.form['username']
-        password = request.form['password']
-
-    return render_template('login.html',role = 'inspector')
-     
-    
-@app.route('/customerlogin', methods=['POST','GET'])
-def customerlogin():
-    if 'username' in request.form:
-        username = request.form['username']
-        password = request.form['password']
-
-    return render_template('login.html',role = 'customer')
+    return render_template('login.html',role = client)
 
 @app.route('/farmer')
 def farmer():
