@@ -88,6 +88,9 @@ class FTAKdb(PostgresqlDB):
 
     #Type functions
     def dql_output_to_dictList(dql_output):
+        """
+        For a query output, returns a list of dictionaries of the form [{column: value}]
+        """
         results = []
         for entry in [x for x in dql_output]:
             results.append({key : val for val, key in (zip(entry, dql_output.keys()))})
@@ -129,12 +132,18 @@ class FTAKdb(PostgresqlDB):
 
         return self.dql_to_dictList(query)
 
-    def get_citied_from_country_name(self, name):
+    def get_cities_from_country_name(self, name):
         query = f"SELECT city_id, city.name \
             FROM city, country \
-            WHERE city.country_id = country.country_id AND city.name = {name}"
+            WHERE city.country_id = country.country_id AND country.name = '{name}'"
 
         return self.dql_to_dictList(query)
+
+    def get_country_city_dict(self):
+        countries = set([entry['name'] for entry in self.get_countries()])
+        print(self.get_cities_from_country_name('Canada'))
+
+        return {country : [entry['name'] for entry in self.get_cities_from_country_name(country)] for country in countries}
 
     # DD DM
     def insert_farmer(self, first_name, last_name, DoB, DoJ, phone_number, address_id):
@@ -180,11 +189,17 @@ class FTAKdb(PostgresqlDB):
         street_number = "NULL" if street_number==None else street_number
         postal_code = "NULL" if postal_code==None else postal_code
 
-        query = f"INSERT INTO address(city_id, country_id, street_name, street_number, postal_code)\
-            VALUES ({city_id}, {country_id}, '{street_name}', '{street_number}', '{postal_code}')"
+        if len(self.dql_to_dictList(f"SELECT address_id FROM address WHERE city_id={city_id} AND country_id={country_id} AND street_name='{street_name}'")) == 0:
+            query = f"INSERT INTO address(city_id, country_id, street_name, street_number, postal_code)\
+                VALUES ({city_id}, {country_id}, '{street_name}', '{street_number}', '{postal_code}')"
+            self.execute_ddl_and_dml_commands(query)
+            print("Inserted address")
+        else:
+            print("Address already exists")
         
-        self.execute_ddl_and_dml_commands(query)
-        print("Inserted address")
+
+        address_id = self.dql_to_dictList(f"SELECT address_id FROM address WHERE city_id={city_id} AND country_id={country_id} AND street_name='{street_name}'")[0]['address_id']
+        return address_id
 
     
     # Roles and logins
@@ -195,9 +210,29 @@ class FTAKdb(PostgresqlDB):
             return None
         
         db = FTAKdb(username, password, host, port)
+        # Farmer has access to address table
         if db.execute_dql_commands("SELECT * FROM address") == None:
             #Unknown password
             return None
+
+        return db
+
+    def inspector_login(username, password, host, port):
+        db = FTAKdb(username, password, host, port)
+        # inspector has access to farmer table
+        if db.execute_dql_commands("SELECT * FROM farmer") == None:
+            #Unknown password
+            return None
+
+        return db
+
+    def customer_login(username, password, host, port):
+        db = FTAKdb(username, password, host, port)
+
+        ## Dk what restriction rn
+        # if db.execute_dql_commands("SELECT * FROM ") == None:
+        #     #Unknown password
+        #     return None
 
         return db
 
