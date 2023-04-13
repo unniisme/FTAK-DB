@@ -30,7 +30,6 @@ def login():
     global db
 
     client = request.args.get('role')
-    print(client)
     if 'username' in request.form:
         username = request.form['username']
         password = request.form['password']

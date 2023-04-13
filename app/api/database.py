@@ -22,6 +22,7 @@ class PostgresqlDB:
         self.port = port
         self.db_name = db_name
         self.engine = self.create_db_engine()
+        self.session_dict = {}
 
     def create_db_engine(self):
         """
@@ -190,47 +191,49 @@ class FTAKdb(PostgresqlDB):
     def farmer_login(username, password, host, port):
         db = FTAKdb(admin_username, admin_password, host, port)
         if (len(db.dql_to_dictList(f"SELECT * FROM farmer_login WHERE username='{username}'")) == 0):
+            #Unknown username
             return None
         
         db = FTAKdb(username, password, host, port)
         if db.execute_dql_commands("SELECT * FROM address") == None:
+            #Unknown password
             return None
 
         return db
 
 
     def farmer_sign_up(self, username, password, first_name, last_name, DoB, DoJ, phone_number, address_id):
-        try:
-            if len(self.dql_to_dictList(f"SELECT * FROM farmer_login WHERE username='{username}'")) != 0:
-                print("User already exists")
-                return -1
-
-            role_query = f"CREATE ROLE {username} LOGIN PASSWORD '{password}'"
-            self.execute_ddl_and_dml_commands(role_query)
-            print("Created role", username)
-
-            new_farmer_id = self.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
-            farmer_login_query = f"INSERT INTO farmer_login VALUES('{username}', {new_farmer_id})"
-            self.execute_ddl_and_dml_commands(farmer_login_query)
-            print("Created farmer")
-
-            view_query=f"CREATE VIEW {username}_farmer_info AS \
-                SELECT * FROM farmer NATURAL JOIN farmer_product NATURAL JOIN farmer_plot NATURAL JOIN farmer_depot \
-                WHERE farmer_id={new_farmer_id}"
-            self.execute_ddl_and_dml_commands(view_query)
-            print("Created view")
-
-            permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
-                GRANT SELECT ON product TO {username}; \
-                GRANT SELECT ON address TO {username}; \
-                GRANT SELECT ON country TO {username}; \
-                GRANT SELECT ON city TO {username}; \
-                GRANT SELECT ON depot TO {username}"
-            self.execute_ddl_and_dml_commands(permissions_query)
-            print("Granted permissions")
-
-        except Exception as e:
-            print(e)
+        if len(self.dql_to_dictList(f"SELECT * FROM farmer_login WHERE username='{username}'")) != 0:
+            print("User already exists")
             return -1
+
+        role_query = f"CREATE ROLE {username} LOGIN PASSWORD '{password}'"
+        self.execute_ddl_and_dml_commands(role_query)
+        print("Created role", username)
+
+        new_farmer_id = self.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
+        farmer_login_query = f"INSERT INTO farmer_login VALUES('{username}', {new_farmer_id})"
+        self.execute_ddl_and_dml_commands(farmer_login_query)
+        print("Created farmer")
+
+        view_query=f"CREATE VIEW {username}_farmer_info AS \
+            SELECT f.*, fp.farmer_product_id, fp.product_id, fp.quantity, fp.depot_id, fpl.plot_id, fpl.plot_size, fpl.longitude, fpl.latitude \
+            FROM farmer f \
+            LEFT JOIN farmer_plot fpl ON fpl.farmer_id = f.farmer_id \
+            LEFT JOIN farmer_product fp ON fp.farmer_id = f.farmer_id \
+            WHERE f.farmer_id = {new_farmer_id}"
+        self.execute_ddl_and_dml_commands(view_query)
+        print("Created view")
+
+
+
+        permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
+            GRANT SELECT ON product TO {username}; \
+            GRANT SELECT ON address TO {username}; \
+            GRANT SELECT ON country TO {username}; \
+            GRANT SELECT ON city TO {username}; \
+            GRANT SELECT ON depot TO {username}"
+        self.execute_ddl_and_dml_commands(permissions_query)
+        print("Granted permissions")
 
         return 0
