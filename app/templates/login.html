@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="{{ url_for('static',filename='css/home.css') }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='css/login.css') }}">
 
 <!DOCTYPE html>
 <html>
@@ -11,15 +11,20 @@
 
     <h1 class="heading">Login {{role}}</h1>
 
-    <div class="div1"></div>
-    <form method="post">
+    
+    <form class="login-form" method="post">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username"><br>
         <label for="password">Password:</label>
         <input type="password" id="password" name="password"><br>
-        <input type="submit" value="Login">
+        <input class = "button" type="submit" value="Login">
     </form>
-    </div>
+    
+    {% if role == "farmer" %}
+        <div class="signup-container">
+            <input class="signup-button" type="submit" value="Signup">Sign Up</input>
+        </div>
+    {% endif %}
 
 </body>
 </html>

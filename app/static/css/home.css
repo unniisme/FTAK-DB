@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
 html{
     position:relative;  
     min-height:100%;
+	font-family: 'Montserrat';
 }
 
 body{
@@ -10,6 +13,7 @@ body{
     background-color: rgb(155, 188, 189);
     text-align: center;
     margin: 0 0 100px;
+	font-family: 'Montserrat';
   }
 
   .div1{
@@ -19,7 +23,6 @@ body{
     color:white;
     border-radius: 25px;
     overflow-x: auto;
-    font-family: 'Poppins'; 
     padding: 20px 20px;
 
   }
@@ -27,7 +30,6 @@ body{
     font-size: 40px;
     padding: 7px 7px;
     color:#ffffff;
-    font-family: 'Lobster';
     text-align: center;
   }
 
@@ -71,7 +73,7 @@ body{
 	animation-duration: 20s;
 	border-radius: 50%;
 	border-top-left-radius: 0 !important;
-	background: rgba(47, 44, 92, 0.5);
+	background: rgba(151, 252, 120, 0.5);
 }
 
 .circles li:nth-child(2) {
@@ -93,7 +95,7 @@ body{
 	animation-duration: 20s;
 	border-radius: 50%;
 	border-top-left-radius: 0 !important;
-	background: rgba(47, 44, 92, 0.5);
+	background: rgba(255, 191, 15, 0.897);
 }
 
 .circles li:nth-child(4) {
@@ -115,7 +117,7 @@ body{
 	animation-duration: 20s;
 	border-radius: 50%;
 	border-top-left-radius: 0 !important;
-	background: rgba(96, 183, 199, 0.5);
+	background: rgba(255, 186, 121, 0.897);
 }
 
 .circles li:nth-child(6) {
@@ -126,7 +128,7 @@ body{
 	animation-duration: 25s;
 	border-radius: 50%;
 	border-top-left-radius: 0 !important;
-	background: rgba(114, 63, 145, 0.5);
+	background: rgba(250, 138, 200, 0.877);
 }
 
 .circles li:nth-child(7) {
@@ -137,7 +139,7 @@ body{
 	animation-duration: 30s;
 	border-radius: 50%;
 	border-top-left-radius: 0 !important;
-	background: rgba(47, 44, 92, 0.5);
+	background: rgba(231, 127, 226, 0.856);
 }
 
 .circles li:nth-child(8) {
@@ -148,7 +150,7 @@ body{
 	animation-duration: 35s;
 	border-radius: 50%;
 	border-top-left-radius: 0 !important;
-	background: rgba(114, 63, 145, 0.5);
+	background: rgba(206, 152, 240, 0.856);
 }
 
 .circles li:nth-child(9) {
@@ -159,7 +161,7 @@ body{
 	animation-duration: 40s;
 	border-radius: 50%;
 	border-top-left-radius: 0 !important;
-	background: rgba(47, 44, 92, 0.5);
+	background: rgba(3, 86, 92, 0.863);
 }
 
 .circles li:nth-child(10) {
@@ -170,34 +172,9 @@ body{
 	animation-duration: 45s;
 	border-radius: 50%;
 	border-top-left-radius: 0 !important;
-	background: rgba(96, 183, 199, 0.5);
+	background: rgba(101, 18, 255, 0.5);
 }
 
-.button {
-	display: inline-block;
-	background-color: #4CAF50;
-	border: none;
-	color: white;
-	padding: 10px 20px;
-	text-align: center;
-	text-decoration: none;
-	font-size: 16px;
-	margin: 10px;
-	cursor: pointer;
-	border-radius: 25px;
-	box-shadow: 0px 0px 10px #888888;
-  }
-  
-  .button:hover {
-	background-color: #3e8e41;
-  }
-  
-  .button:active {
-	background-color: #3e8e41;
-	box-shadow: 0px 0px 5px #888888;
-  }
-  
-  
 @keyframes animate {
 	0% {
 		transform: translateY(0) rotate(0deg);
@@ -212,4 +189,33 @@ body{
 		opacity: 0;
 	}
 }
+  
+
+/* buttons */ 
+
+.button {
+	display: inline-block;
+	background-color: #cc5697;
+	border: none;
+	color: white;
+	padding: 10px 20px;
+	text-align: center;
+	text-decoration: none;
+	font-size: 16px;
+	margin: 10px;
+	cursor: pointer;
+	border-radius: 25px;
+	box-shadow: 0px 0px 10px #888888;
+  }
+  
+  .button:hover {
+	background-color: #ff95be;
+	color: black;
+  }
+  
+  .button:active {
+	background-color: #a74d60;
+	box-shadow: 0px 0px 5px #888888;
+  }
+  
   
