@@ -20,20 +20,17 @@ def home():
     if request.method =='POST':
         if 'role' in request.form:
             role = request.form['role']
-            if role == 'FARMER':
-                return redirect(url_for('farmer_login'))
-            if role == 'INSPECTOR':
-                return redirect(url_for('inspector_login'))
-            if role == 'CUSTOMER':
-                return redirect(url_for('customer_login'))
-            return role
+            return redirect(url_for('login',role = role))
+            
     return render_template('home.html')
 
 
-@app.route('/<client>_login', methods=['POST','GET'])
-def login(client):
+@app.route('/login', methods=['POST','GET'])
+def login():
     global db
 
+    client = request.args.get('role')
+    print(client)
     if 'username' in request.form:
         username = request.form['username']
         password = request.form['password']
