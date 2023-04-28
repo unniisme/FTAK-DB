@@ -114,3 +114,16 @@ CREATE TABLE farmer_login (
 
   FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id)
 );
+
+--A log of requests a farmer can make to farmer_plot table. Each entry in this table has to be approved by a supervisor to be added to farmer plot table
+CREATE TABLE farmer_plot_approval (
+  id SERIAL PRIMARY KEY,
+  farmer_id INT NOT NULL,
+  plot_size INT NOT NULL,
+  longitude NUMERIC NOT NULL,
+  latitude NUMERIC NOT NULL,
+  FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
+
+  approved BOOLEAN,
+  entry_time timestamp
+);
