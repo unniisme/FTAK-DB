@@ -80,7 +80,12 @@ def register():
 
 @app.route('/farmer')
 def farmer():
-    return "Logged in as " + db.user_name 
+    try:
+        farmer_data = db.get_details()
+        return f"Logged in as {db.user_name} <br>\
+            User details: <br>" + "<br>".join([f"{str(key)}\t:\t{farmer_data[key]}" for key in farmer_data])
+    except:
+        return "Not logged in"            
 
 if __name__ == '__main__':
     app.run()

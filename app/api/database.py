@@ -209,19 +209,20 @@ class FTAKdb(PostgresqlDB):
             #Unknown username
             return None
         
-        db = FTAKdb(username, password, host, port)
-        # Farmer has access to address table
-        if db.execute_dql_commands("SELECT * FROM address") == None:
+        db = FARMERdb(username, password, host, port)
+        # Farmer has access to country table
+        if db.execute_dql_commands("SELECT * FROM country") == None:
             #Unknown password
             return None
 
         return db
 
     def inspector_login(username, password, host, port):
-        db = FTAKdb(username, password, host, port)
+
+        db = INSPECTORdb(username, password, host, port)
         # inspector has access to farmer table
         if db.execute_dql_commands("SELECT * FROM farmer") == None:
-            #Unknown password
+            #Unknown username or password
             return None
 
         return db
@@ -263,8 +264,8 @@ class FTAKdb(PostgresqlDB):
 
 
         permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
+            GRANT INSERT ON farmer_plot_approval TO {username}; \
             GRANT SELECT ON product TO {username}; \
-            GRANT SELECT ON address TO {username}; \
             GRANT SELECT ON country TO {username}; \
             GRANT SELECT ON city TO {username}; \
             GRANT SELECT ON depot TO {username}"
@@ -272,3 +273,40 @@ class FTAKdb(PostgresqlDB):
         print("Granted permissions")
 
         return 0
+
+class INSPECTORdb(FTAKdb):
+
+    def approve_farmer_plot(entry_id):
+        query = f"UPDATE farmer_plot_approval SET approved = TRUE WHERE id = {entry_id}"
+
+        self.execute_ddl_and_dml_commands(query)
+
+    def update_farmer_plot():
+        self.execute_ddl_and_dml_commands("SELECT approve_farmer_plot_requests()")
+
+    def approve_farmer_plot(entry_id):
+        query = f"UPDATE farmer_depot_approval SET approved = TRUE WHERE id = {entry_id}"
+
+        self.execute_ddl_and_dml_commands(query)
+
+    def update_farmer_plot():
+        self.execute_ddl_and_dml_commands("SELECT approve_farmer_depot_requests()")
+
+
+class FARMERdb(FTAKdb):
+
+    def __init__(self, username, password, host, port):
+
+        super().__init__(username, password, host, port)
+
+        self.farmer_info_view = (self.user_name) + "_farmer_info"
+
+    def get_details(self):
+        return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.farmer_info_view};")[0]
+
+    def insert_plot(self, plot_size, longitude, latitude):
+
+        query = f"INSERT INTO farmer_plot_approval (plot_size, longitude, latitude, approved, entry_time) \
+            VALUES ({plot_size}, {longitude}, {latitude}, FALSE, NOW());"
+    
+        self.execute_ddl_and_dml_commands(query)
