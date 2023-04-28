@@ -14,3 +14,16 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+--Transfer all approved requests to farmer-product
+CREATE OR REPLACE PROCEDURE approved_farmer_depot_requests() AS 
+$$
+BEGIN
+  INSERT INTO farmer_depot (farmer_id, depot_id)
+  SELECT farmer_id, depot_id
+  FROM farmer_product_approval
+  WHERE approved = TRUE;
+END;
+$$ LANGUAGE plpgsql;
+
+

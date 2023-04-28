@@ -127,3 +127,16 @@ CREATE TABLE farmer_plot_approval (
   approved BOOLEAN,
   entry_time timestamp
 );
+
+--Similar log for farmer_depot
+
+CREATE TABLE farmer_depot_approval (
+  id SERIAL PRIMARY KEY,
+  farmer_id INT NOT NULL,
+  depot_id INT NOT NULL,
+  FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
+  FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
+
+  approved BOOLEAN,
+  entry_time timestamp
+);
