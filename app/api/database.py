@@ -304,6 +304,14 @@ class FTAKdb(PostgresqlDB):
 
 class INSPECTORdb(FTAKdb):
 
+    def get_approval_list(self, tableName):
+        if tableName not in ["plot", "depot", "product"]:
+            print("Unknown table")
+            return -1
+
+        query = f"SELECT * FROM farmer_{tableName}_approval"
+        return self.dql_to_tupleList(query)
+
     def approve_farmer_plot(self, entry_id):
         query = f"UPDATE farmer_plot_approval SET approved = TRUE WHERE id = {entry_id}"
 
@@ -327,14 +335,6 @@ class INSPECTORdb(FTAKdb):
 
     def update_farmer_product(self):
         self.execute_ddl_and_dml_commands("SELECT approve_farmer_product_requests()")
-
-    def getApprovalList(self, tableName):
-        if tableName not in ["plot", "depot", "product"]:
-            print("Unknown table")
-            return -1
-
-        query = f"SELECT * FROM farmer_{tableName}_approval"
-        return self.dql_to_tupleList(query)
 
 
 class FARMERdb(FTAKdb):
