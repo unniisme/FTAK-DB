@@ -97,6 +97,8 @@ body{
   }
   
   .login-form input[type="text"],
+  .login-form input[type="tel"],
+  .login-form input[type="date"],
   .login-form input[type="password"] {
     width: 60vh;
     padding: 10px;
@@ -106,6 +108,7 @@ body{
     border-radius: 3px;
     box-sizing: border-box;
   }
+ 
   
 /* signup button */ 
 
@@ -166,4 +169,5 @@ body{
     background-color: #ff95be;
 	color: black;
   }
-  
+
+

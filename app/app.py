@@ -92,14 +92,40 @@ def farmer_signup():
 
     return render_template('signup_farmer.html', countries=db.get_country_city_dict(), address_id = address_id)
 
-@app.route('/farmer')
+@app.route('/farmer',methods=['POST'])
 def farmer():
     try:
         farmer_data = db.get_details()
-        return f"Logged in as {db.user_name} <br>\
-            User details: <br>" + "<br>".join([f"{str(key)}\t:\t{farmer_data[key]}" for key in farmer_data])
+        name = farmer_data['first_name'] + " " + farmer_data['last_name']
+        phonenumber = farmer_data['phone_number']
+        farmerid = farmer_data['farmer_id']
+
+        if request.form['action'] == 'plot':
+            return redirect(url_for('plot'))
+        elif request.form['action'] == 'depot':
+            return redirect(url_for('depot'))
+        elif request.form['action'] == 'product':
+            return redirect(url_for('product'))
+
+        return render_template('farmer.html', username = db.user_name, name = name, phone_number = phonenumber,farmer_id = farmerid)
+        
     except:
-        return "Not logged in"            
+        return "Not logged in"     
+
+
+@app.route('/farmer/plot', methods=['GET', 'POST'])
+def plot():
+    # code for farmer's plot page
+
+
+@app.route('/farmer/depot', methods=['GET', 'POST'])
+def depot():
+    # code for farmer's depot page
+
+
+@app.route('/farmer/product', methods=['GET', 'POST'])
+def product():
+    # code for farmer's product page       
 
 if __name__ == '__main__':
     app.run()
