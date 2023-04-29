@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="{{ url_for('static',filename='css/login.css') }}">
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+
+
+
+    <h1 class="heading">Signup</h1>
+
+    
+    <form class="login-form" method="post">
+        <label for="user_name">username:</label>
+        <input type="text" id="user_name" name="user_name" required><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br>
+        <label for="Confirmpassword">Confirm Password:</label>
+        <input type="password" id="Confirmpassword" name="Confirmpassword" required><br>
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" required><br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" required><br>
+        <label for="DoB">Date of Birth:</label>
+        <input type="date" id="DoB" name="DoB" required><br>
+        <label for="DoJ">Date of Joining:</label>
+        <input type="date" id="DoJ" name="DoJ" required><br>
+        <label for="phone_number">Phone Number:</label>
+        <input type="tel" id="phone_number" name="phone_number" pattern="[0-9]{10}" required><br>
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" required><br>
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required><br>
+        <label for="street_name">Street Name:</label>
+        <input type="text" id="street_name" name="street_name" required><br>
+        <input class="button" type="submit" value="Sign Up">
+    </form>
+    
+   
+
+</body>
+</html>

@@ -21,9 +21,11 @@
     </form>
     
     {% if role == "farmer" %}
+    <form class="signup-form" method="post">
         <div class="signup-container">
-            <input class="signup-button" type="submit" value="Signup">Sign Up</input>
+            <input class="signup-button" type="submit" name="signup" value="Signup"></input>
         </div>
+    </form>
     {% endif %}
 
 </body>
