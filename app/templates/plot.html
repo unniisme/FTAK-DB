@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="{{ url_for('static',filename='css/query.css') }}">
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plot</title>
+</head>
+<body>
+
+<p>Plot Table</p>
+
+
+<table>
+    <thead>
+      <tr>
+        {% for key in result[0].keys() %}
+        <th>{{ key }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in result %}
+      <tr>
+        {% for key, value in row.items() %}
+        <td>{{ value }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<br>
+<br>
+
+<form class="login-form" method="post">
+    <h1>Insert Plot</h1>
+    <label for="plot_size">Plot Size:</label>
+    <input type="text" id="plot_size" name="plot_size"><br>
+    <label for="longitude">Longitude:</label>
+    <input type="text" id="longitude" name="longitude"><br>
+    <label for="latitude">Latitude:</label>
+    <input type="text" id="latitude" name="latitude"><br>
+    <input class = "button" type="submit" value="Submit">
+</form>
+
+</body>
+</html>
