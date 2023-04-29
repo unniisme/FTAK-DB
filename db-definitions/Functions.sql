@@ -15,15 +15,29 @@ END;
 $$
 LANGUAGE plpgsql;
 
---Transfer all approved requests to farmer-product
-CREATE OR REPLACE PROCEDURE approved_farmer_depot_requests() AS 
+--Transfer all approved requests to farmer-depot
+CREATE OR REPLACE PROCEDURE approve_farmer_depot_requests() AS 
 $$
 BEGIN
   INSERT INTO farmer_depot (farmer_id, depot_id)
   SELECT farmer_id, depot_id
   FROM farmer_product_approval
-  WHERE approved = TRUE;
+  WHERE approved IS TRUE;
 END;
 $$ LANGUAGE plpgsql;
+
+--Transfer all approved requests to farmer-product
+CREATE OR REPLACE PROCEDURE approve_farmer_product_requests() AS
+$$
+BEGIN
+  -- Insert all approved requests into farmer_product table
+  INSERT INTO farmer_product (farmer_id, product_id, quantity, depot_id)
+  SELECT farmer_id, product_id, quantity, depot_id
+  FROM farmer_product_approval
+  WHERE approved IS TRUE;
+
+END;
+$$
+LANGUAGE plpgsql;
 
 

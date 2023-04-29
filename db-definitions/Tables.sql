@@ -129,12 +129,27 @@ CREATE TABLE farmer_plot_approval (
 );
 
 --Similar log for farmer_depot
-
 CREATE TABLE farmer_depot_approval (
   id SERIAL PRIMARY KEY,
   farmer_id INT NOT NULL,
   depot_id INT NOT NULL,
   FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
+  FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
+
+  approved BOOLEAN,
+  entry_time timestamp
+);
+
+--Similar for farmer product
+CREATE TABLE farmer_product_approval (
+  id SERIAL PRIMARY KEY,
+
+  farmer_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL,
+  depot_id INT NOT NULL,
+  FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
+  FOREIGN KEY (product_id) REFERENCES product (product_id),
   FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
 
   approved BOOLEAN,

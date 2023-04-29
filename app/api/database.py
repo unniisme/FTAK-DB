@@ -96,9 +96,19 @@ class FTAKdb(PostgresqlDB):
             results.append({key : val for val, key in (zip(entry, dql_output.keys()))})
         return results
 
+    def dql_output_to_tupleList(dql_output):
+        """
+        For a query output, returns a list of dictionaries of the form [(columns), (row 1), (row 2)...]
+        """
+        return [tuple(dql_output.keys())] + [tuple(entry) for entry in dql_output]
+
     def dql_to_dictList(self, query):
         result = self.execute_dql_commands(query)
         return FTAKdb.dql_output_to_dictList(result)
+
+    def dql_to_tupleList(self, query):
+        result = self.execute_dql_commands(query)
+        return FTAKdb.dql_output_to_tupleList(result)
 
     def print_dql(self, query):
         result = self.execute_dql_commands(query)
@@ -245,54 +255,85 @@ class FTAKdb(PostgresqlDB):
             print("User already exists")
             return -1
 
-        role_query = f"CREATE ROLE {username} LOGIN PASSWORD '{password}'"
-        self.execute_ddl_and_dml_commands(role_query)
-        print("Created role", username)
+        with self.engine.connect() as connection:
+            trans = connection.begin()
+            try:                
+                role_query = f"CREATE ROLE {username} LOGIN PASSWORD '{password}'"
+                connection.execute(text(role_query))
+                print("Created role", username)
 
-        new_farmer_id = self.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
-        farmer_login_query = f"INSERT INTO farmer_login VALUES('{username}', {new_farmer_id})"
-        self.execute_ddl_and_dml_commands(farmer_login_query)
-        print("Created farmer")
+                new_farmer_id = self.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
+                farmer_login_query = f"INSERT INTO farmer_login VALUES('{username}', {new_farmer_id})"
+                connection.execute(text(farmer_login_query))
+                print("Created farmer")
 
-        view_query=f"CREATE VIEW {username}_farmer_info AS \
-            SELECT f.*, fp.farmer_product_id, fp.product_id, fp.quantity, fp.depot_id, fpl.plot_id, fpl.plot_size, fpl.longitude, fpl.latitude \
-            FROM farmer f \
-            LEFT JOIN farmer_plot fpl ON fpl.farmer_id = f.farmer_id \
-            LEFT JOIN farmer_product fp ON fp.farmer_id = f.farmer_id \
-            WHERE f.farmer_id = {new_farmer_id}"
-        self.execute_ddl_and_dml_commands(view_query)
-        print("Created view")
+                view_query=f"CREATE VIEW {username}_farmer_info AS \
+                    SELECT f.*, fp.farmer_product_id, fp.product_id, fp.quantity, fp.depot_id, fpl.plot_id, fpl.plot_size, fpl.longitude, fpl.latitude \
+                    FROM farmer f \
+                    LEFT JOIN farmer_plot fpl ON fpl.farmer_id = f.farmer_id \
+                    LEFT JOIN farmer_product fp ON fp.farmer_id = f.farmer_id \
+                    WHERE f.farmer_id = {new_farmer_id}"
+                connection.execute(text(view_query))
+                print("Created view")
 
 
 
-        permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
-            GRANT INSERT ON farmer_plot_approval TO {username}; \
-            GRANT SELECT ON product TO {username}; \
-            GRANT SELECT ON country TO {username}; \
-            GRANT SELECT ON city TO {username}; \
-            GRANT SELECT ON depot TO {username}"
-        self.execute_ddl_and_dml_commands(permissions_query)
-        print("Granted permissions")
+                permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
+                    GRANT INSERT ON farmer_plot_approval TO {username}; \
+                    GRANT INSERT ON farmer_depot_approval TO {username}; \
+                    GRANT INSERT ON farmer_product_approval TO {username}; \
+                    GRANT SELECT ON product TO {username}; \
+                    GRANT SELECT ON country TO {username}; \
+                    GRANT SELECT ON city TO {username}; \
+                    GRANT SELECT ON depot TO {username}"
+                connection.execute(text(permissions_query))
+                print("Granted permissions")
+
+                connection.execute(text("COMMIT;"))
+                connection.execute(text("END;"))
+
+                trans.commit()
+
+            except Exception as e:
+                trans.rollback()
+                print("Rolling Back")
+                print(e)
 
         return 0
 
 class INSPECTORdb(FTAKdb):
 
-    def approve_farmer_plot(entry_id):
+    def approve_farmer_plot(self, entry_id):
         query = f"UPDATE farmer_plot_approval SET approved = TRUE WHERE id = {entry_id}"
 
         self.execute_ddl_and_dml_commands(query)
 
-    def update_farmer_plot():
+    def update_farmer_plot(self):
         self.execute_ddl_and_dml_commands("SELECT approve_farmer_plot_requests()")
 
-    def approve_farmer_plot(entry_id):
+    def approve_farmer_depot(self, entry_id):
         query = f"UPDATE farmer_depot_approval SET approved = TRUE WHERE id = {entry_id}"
 
         self.execute_ddl_and_dml_commands(query)
 
-    def update_farmer_plot():
+    def update_farmer_depot(self):
         self.execute_ddl_and_dml_commands("SELECT approve_farmer_depot_requests()")
+
+    def approve_farmer_product(self, entry_id):
+        query = f"UPDATE farmer_product_approval SET approved = TRUE WHERE id = {entry_id}"
+
+        self.execute_ddl_and_dml_commands(query)
+
+    def update_farmer_product(self):
+        self.execute_ddl_and_dml_commands("SELECT approve_farmer_product_requests()")
+
+    def getApprovalList(self, tableName):
+        if tableName not in ["plot", "depot", "product"]:
+            print("Unknown table")
+            return -1
+
+        query = f"SELECT * FROM farmer_{tableName}_approval"
+        return self.dql_to_tupleList(query)
 
 
 class FARMERdb(FTAKdb):
@@ -307,8 +348,16 @@ class FARMERdb(FTAKdb):
         return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.farmer_info_view};")[0]
 
     def insert_plot(self, plot_size, longitude, latitude):
+        query = f"INSERT INTO farmer_plot_approval (farmer_id, plot_size, longitude, latitude, approved, entry_time) \
+            VALUES ({self.get_details()['farmer_id']}, {plot_size}, {longitude}, {latitude}, FALSE, NOW());"
+        self.execute_ddl_and_dml_commands(query)
 
-        query = f"INSERT INTO farmer_plot_approval (plot_size, longitude, latitude, approved, entry_time) \
-            VALUES ({plot_size}, {longitude}, {latitude}, FALSE, NOW());"
-    
+    def insert_depot(self, depot_id):
+        query = f"INSERT INTO farmer_depot_approval (farmer_id, depot_id, approved, entry_time) \
+                VALUES ({self.get_details()['farmer_id']}, {depot_id}, FALSE, NOW());"
+        self.execute_ddl_and_dml_commands(query)
+
+    def insert_product(self, product_id, quantity, depot_id):
+        query = f"INSERT INTO farmer_product_approval (farmer_id, product_id, quantity, depot_id, approved, entry_time) \
+                VALUES ({self.get_details()['farmer_id']}, {product_id}, {quantity}, {depot_id}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
