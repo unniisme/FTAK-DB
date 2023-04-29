@@ -83,8 +83,7 @@ def farmer_signup():
             return redirect(request.url)
         
         # Insert farmer into database
-        db.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
-        db.farmer_sign_up(user_name,password1, first_name, last_name, DoB, DoJ, phone_number, address_id)
+        db.farmer_sign_up(user_name, password1, first_name, last_name, DoB, DoJ, phone_number, address_id)
 
 
         return redirect(url_for("login", role="farmer"))
