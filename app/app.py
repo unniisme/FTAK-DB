@@ -128,7 +128,7 @@ def plot():
     if request.method == "POST":
         db.insert_plot(request.form['plot_size'], request.form['longitude'], request.form['latitude'])
 
-    return render_template('')
+    return render_template('plot.html', result = db.get_plots())
 
 
 @app.route('/farmer/depot', methods=['GET', 'POST'])
@@ -137,7 +137,7 @@ def depot():
     if request.method == "POST":
         db.insert_depot(request.form['depot_id'])
 
-    return render_template('')
+    return render_template('dept.html',result = db.get_depots())
 
 
 @app.route('/farmer/product', methods=['GET', 'POST'])
@@ -146,7 +146,7 @@ def product():
     if request.method == "POST":
         db.insert_product(request.form['product_id'], request.form['quantity'], request.form['depot_id'])
 
-    return render_template('')
+    return render_template('product.html',result = db.get_products())
     # code for farmer's product page       
 
 if __name__ == '__main__':

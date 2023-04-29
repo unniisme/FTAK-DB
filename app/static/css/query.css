@@ -74,6 +74,8 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top:20px;
+    margin-bottom:20px;
   }
   
   .login-form {
@@ -182,6 +184,7 @@ table {
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
     text-align: center;
     margin: auto auto;
+    margin-bottom:50px;
   }
   
   th, td {
