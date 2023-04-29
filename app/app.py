@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect,  url_for
+from flask import Flask, render_template, request, redirect,  url_for, flash
 from api.database import FTAKdb
 
 app = Flask(__name__)
@@ -30,6 +30,11 @@ def login():
     global db
 
     client = request.args.get('role')
+    
+    if 'signup' in request.form and request.form['signup'] == 'Signup':
+        print("signup clicked")
+        return redirect(url_for("farmer_signup"))
+
     if 'username' in request.form:
         username = request.form['username']
         password = request.form['password']
@@ -48,35 +53,44 @@ def login():
 
     return render_template('login.html',role = client)
 
-@app.route('/farmer_signup', methods=['POST'])
-def register():
+@app.route('/farmer_signup', methods=['POST','GET'])
+def farmer_signup():
     global db
 
     address_id = None
 
     if request.method == "POST":
-        # Method to define address
-        if "street_name" in request.form:
-            country = request.form["country"]
-            city = request.form["city"]
-            street_name = request.form["street_name"]
+        # Handle address details
+        country = request.form["country"]
+        city = request.form["city"]
+        street_name = request.form["street_name"]
 
-            address_id = db.insert_address(country, city, street_name)
+        # Insert address into database
+        address_id = db.insert_address(country, city, street_name)
         
-        elif "first_name" in request.form:
-            first_name = request.form["first_name"]
-            last_name = request.form["last_name"]
-            DoB = request.form["DoB"]
-            DoJ = request.form["first_name"]
-            phone_number = request.form["phone_number"]
-            address_id = request.form["address_id"]
+        # Handle user details
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        DoB = request.form["DoB"]
+        DoJ = request.form["DoJ"]
+        phone_number = request.form["phone_number"]
+        user_name = request.form["user_name"]
+        password1 = request.form["password"]
+        password2 = request.form["Confirmpassword"]
 
-            db.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
+        if password1 != password2:
+            flash("Passwords do not match.")
+            return redirect(request.url)
+        
+        # Insert farmer into database
+        db.insert_farmer(first_name, last_name, DoB, DoJ, phone_number, address_id)
+        db.farmer_sign_up(user_name,password1, first_name, last_name, DoB, DoJ, phone_number, address_id)
 
-            return redirect(url_for("login", role="farmer"))
+
+        return redirect(url_for("login", role="farmer"))
 
 
-    return render_template('signup.html', countries=db.get_country_city_dict(), address_id = address_id)
+    return render_template('signup_farmer.html', countries=db.get_country_city_dict(), address_id = address_id)
 
 @app.route('/farmer')
 def farmer():

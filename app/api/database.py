@@ -207,12 +207,14 @@ class FTAKdb(PostgresqlDB):
         db = FTAKdb(admin_username, admin_password, host, port)
         if (len(db.dql_to_dictList(f"SELECT * FROM farmer_login WHERE username='{username}'")) == 0):
             #Unknown username
+            print("unknown username")
             return None
         
         db = FARMERdb(username, password, host, port)
         # Farmer has access to country table
         if db.execute_dql_commands("SELECT * FROM country") == None:
             #Unknown password
+            print("unknown password")
             return None
 
         return db
