@@ -125,11 +125,20 @@ def plot():
 
 @app.route('/farmer/depot', methods=['GET', 'POST'])
 def depot():
-    # code for farmer's depot page
+
+    if request.method == "POST":
+        db.insert_depot(request.form['depot_id'])
+
+    return render_template('')
 
 
 @app.route('/farmer/product', methods=['GET', 'POST'])
 def product():
+
+    if request.method == "POST":
+        db.insert_product(request.form['product_id'], request.form['quantity'], request.form['depot_id'])
+
+    return render_template('')
     # code for farmer's product page       
 
 if __name__ == '__main__':
