@@ -92,7 +92,7 @@ def farmer_signup():
 
     return render_template('signup_farmer.html', countries=db.get_country_city_dict(), address_id = address_id)
 
-@app.route('/farmer',methods=['POST'])
+@app.route('/farmer',methods=['POST', "GET"])
 def farmer():
     try:
         farmer_data = db.get_details()
@@ -100,12 +100,13 @@ def farmer():
         phonenumber = farmer_data['phone_number']
         farmerid = farmer_data['farmer_id']
 
-        if request.form['action'] == 'plot':
-            return redirect(url_for('plot'))
-        elif request.form['action'] == 'depot':
-            return redirect(url_for('depot'))
-        elif request.form['action'] == 'product':
-            return redirect(url_for('product'))
+        if request.method == "POST":
+            if request.form['action'] == 'plot':
+                return redirect(url_for('plot'))
+            elif request.form['action'] == 'depot':
+                return redirect(url_for('depot'))
+            elif request.form['action'] == 'product':
+                return redirect(url_for('product'))
 
         return render_template('farmer.html', username = db.user_name, name = name, phone_number = phonenumber,farmer_id = farmerid)
         
@@ -115,7 +116,11 @@ def farmer():
 
 @app.route('/farmer/plot', methods=['GET', 'POST'])
 def plot():
-    # code for farmer's plot page
+    
+    if request.method == "POST":
+        db.insert_plot(request.form['plot_size'], request.form['longitude'], request.form['latitude'])
+
+    return render_template('')
 
 
 @app.route('/farmer/depot', methods=['GET', 'POST'])

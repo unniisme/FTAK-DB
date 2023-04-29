@@ -155,6 +155,13 @@ class FTAKdb(PostgresqlDB):
 
         return {country : [entry['name'] for entry in self.get_cities_from_country_name(country)] for country in countries}
 
+    def get_address(self, address_id):
+        query = f"SELECT address_id, country.name, city.name, street_name, stree_number, postal_code\
+            FROM address NATURAL JOIN country NATURAL JOIN city \
+                WHERE address_id = {address_id}"
+
+        return self.dql_output_to_dictList(query)[0]
+
     # DD DM
     def insert_farmer(self, first_name, last_name, DoB, DoJ, phone_number, address_id):
         query = f"INSERT INTO farmer(first_name, last_name, DoB, DoJ, phone_number, address_id) \
