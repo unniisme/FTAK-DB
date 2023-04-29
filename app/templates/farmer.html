@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="{{ url_for('static',filename='css/home.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static',filename='css/farmer.css') }}">
     </head>
     <body>
         <p>Logged in as {{username}}</p>
         <p> Name : {{name}}</p>
         <p> Phone Number {{phone_number}}</p>
         <form method="POST">
-            <button class="button" value="farmer">View Farmer Table</button>
+            <button class="button" name="action" value="plot">View Plots</button>
+            <button class="button" name="action" value="depot">View Depot</button>
+            <button class="button" name="action" value="product">View Products</button>        
+        </form>
+
+        <form class="query-form" method="POST">
+            <label for="query" id="query">SQL Query</label>
+            <input type="text" id="query" name="query">
+            <button class="button" name="action" value="query">Submit</button>
+
         </form>
     </body>

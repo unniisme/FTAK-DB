@@ -107,12 +107,21 @@ def farmer():
                 return redirect(url_for('depot'))
             elif request.form['action'] == 'product':
                 return redirect(url_for('product'))
+            elif request.form['action'] == 'query':
+                return redirect(url_for('query',query = request.form['query']))
 
         return render_template('farmer.html', username = db.user_name, name = name, phone_number = phonenumber,farmer_id = farmerid)
         
     except:
         return "Not logged in"     
 
+@app.route('/farmer/query',methods=['GET'])
+def query():
+    query = request.args.get('query')
+    result = db.dql_to_dictList(query)
+    if result == None:
+        return "Invalid Query"
+    return render_template('query.html', query = query, result = result)
 
 @app.route('/farmer/plot', methods=['GET', 'POST'])
 def plot():
