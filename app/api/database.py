@@ -292,6 +292,7 @@ class FTAKdb(PostgresqlDB):
                     GRANT SELECT ON product TO {username}; \
                     GRANT SELECT ON country TO {username}; \
                     GRANT SELECT ON city TO {username}; \
+                    GRANT SELECT ON address TO {username}; \
                     GRANT SELECT ON depot TO {username}"
                 connection.execute(text(permissions_query))
                 print("Granted permissions")
@@ -351,9 +352,24 @@ class FARMERdb(FTAKdb):
 
         self.farmer_info_view = (self.user_name) + "_farmer_info"
 
+    # DQ
     def get_details(self):
         return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.farmer_info_view};")[0]
 
+    def get_depots(self):
+        query = f"SELECT i.depot_id, depot.name, depot.address_id,   FROM {self.farmer_info_view} as i JOIN depot ON i.depot_id = depot.depot.id"
+        return self.dql_to_dictList(query)
+
+    def get_plots(self):
+        query = f"SELECT plot_id, plot_size, longitude, latitude FROM {self.farmer_info_view}"
+        return self.dql_to_dictList(query)
+
+    def get_products(self):
+        query = f"SELECT p.product_id, p.name, p.description, p.rate, p.image_link FROM {self.farmer_info_view} as i JOIN product as p ON i.product_id = product.p.product_id"
+        return self.dql_to_dictList(query)
+        
+
+    # DD DM
     def insert_plot(self, plot_size, longitude, latitude):
         query = f"INSERT INTO farmer_plot_approval (farmer_id, plot_size, longitude, latitude, approved, entry_time) \
             VALUES ({self.get_details()['farmer_id']}, {plot_size}, {longitude}, {latitude}, FALSE, NOW());"
