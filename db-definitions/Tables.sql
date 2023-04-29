@@ -63,6 +63,7 @@ CREATE TABLE farmer_depot (
 CREATE TABLE trade (
   trade_id SERIAL,
   farmer_product_id INT NOT NULL,
+  customer_id INT NOT NULL,  --ALTER TABLE trade ADD COLUMN customer_id INT NOT NULL;
   quantity INT NOT NULL,
   depot_id INT NOT NULL,
   unit_rate DECIMAL(10,2) NOT NULL,
@@ -93,6 +94,16 @@ CREATE TABLE city (
   PRIMARY KEY (city_id)
 );
 
+CREATE TABLE customer (
+  customer_id SERIAL,
+  first_name VARCHAR(50) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  phone_number VARCHAR(20) NOT NULL,
+  PRIMARY KEY (customer_id)
+);
+
+
 ALTER TABLE farmer ADD CONSTRAINT address_fk FOREIGN KEY (address_id) REFERENCES address (address_id);
 ALTER TABLE farmer_product ADD CONSTRAINT farmer_fk FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id);
 ALTER TABLE farmer_product ADD CONSTRAINT product_fk FOREIGN KEY (product_id) REFERENCES product (product_id);
@@ -105,6 +116,7 @@ ALTER TABLE trade ADD CONSTRAINT pr_fk FOREIGN KEY (rate) REFERENCES product (ra
 ALTER TABLE address ADD CONSTRAINT city_fk FOREIGN KEY (city_id) REFERENCES city (city_id);
 ALTER TABLE address ADD CONSTRAINT country_fk FOREIGN KEY (country_id) REFERENCES country (country_id);
 ALTER TABLE city ADD CONSTRAINT country_fk FOREIGN KEY (country_id) REFERENCES country (country_id);
+ALTER TABLE trade ADD CONSTRAINT customer_fk FOREIGN KEY (customer_id) REFERENCES customer (customer_id);
 
 
 -- Logins

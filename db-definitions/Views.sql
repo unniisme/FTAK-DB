@@ -2,7 +2,6 @@
 
 --Create users
 CREATE USER Farmer;
-CREATE USER Customer;
 
 --Create views for Farmer
 --Use python definitions instead
