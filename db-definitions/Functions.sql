@@ -26,20 +26,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
---Transfer all approved requests to farmer-product and product table
+--Transfer all approved requests to farmer-product
 CREATE OR REPLACE PROCEDURE approve_farmer_product_requests() AS
 $$
-    BEGIN
-    INSERT INTO product (name, description, rate, image_link)
-    SELECT name, description, rate, image_link
-    FROM farmer_product_approval
-    WHERE approved = true;
+BEGIN
+  -- Insert all approved requests into farmer_product table
+  INSERT INTO farmer_product (farmer_id, product_id, quantity, depot_id)
+  SELECT farmer_id, product_id, quantity, depot_id
+  FROM farmer_product_approval
+  WHERE approved IS TRUE;
 
+END;
+$$
+LANGUAGE plpgsql;
 
-    INSERT INTO farmer_product (farmer_id, product_id, quantity, depot_id)
-    SELECT farmer_id, product_id, quantity, depot_id
-    FROM farmer_product_approval NATURAL JOIN product
-    WHERE approved = true;
+--Add all approved new products
+CREATE OR REPLACE PROCEDURE insert_approved_products() AS 
+$$
+BEGIN
+  INSERT INTO product (name, description, rate, image_link)
+  SELECT name, description, rate, image_link
+  FROM new_product_approval
+  WHERE approved = TRUE;
 END;
 $$ LANGUAGE plpgsql;
 

@@ -145,17 +145,39 @@ CREATE TABLE farmer_product_approval (
   id SERIAL PRIMARY KEY,
 
   farmer_id INT NOT NULL,
-  -- product_id INT NOT NULL,
+  product_id INT NOT NULL,
+  quantity INT NOT NULL,
+  depot_id INT NOT NULL,
+  FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
+  FOREIGN KEY (product_id) REFERENCES product (product_id),
+  FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
+
+  approved BOOLEAN,
+  entry_time timestamp
+);
+
+CREATE TABLE new_product_approval (
+  id SERIAL PRIMARY KEY,
+
+  farmer_id INT NOT NULL,
   name VARCHAR(100) NOT NULL,
   description TEXT,
   rate DECIMAL(10,2) NOT NULL,
   image_link VARCHAR(50),
   quantity INT NOT NULL,
   depot_id INT NOT NULL,
-  
   FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
   FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
 
   approved BOOLEAN,
   entry_time timestamp
+);
+
+CREATE TABLE product (
+  product_id SERIAL,
+  name VARCHAR(100) NOT NULL,
+  description TEXT,
+  rate DECIMAL(10,2) NOT NULL,
+  image_link VARCHAR(50),
+  PRIMARY KEY (product_id)
 );
