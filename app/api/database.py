@@ -161,7 +161,15 @@ class FTAKdb(PostgresqlDB):
                 WHERE address_id = {address_id}"
 
         return self.dql_output_to_dictList(query)[0]
-
+    
+    def get_all_depots(self):
+        query = "SELECT * from depot"
+        return self.dql_to_dictList(query)
+    
+    def get_all_products(self):
+        query = "SELECT * from product"
+        return self.dql_to_dictList(query)
+    
     # DD DM
     def insert_farmer(self, first_name, last_name, DoB, DoJ, phone_number, address_id):
         query = f"INSERT INTO farmer(first_name, last_name, DoB, DoJ, phone_number, address_id) \
@@ -366,7 +374,7 @@ class FARMERdb(FTAKdb):
         return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.farmer_info_view};")[0]
 
     def get_depots(self):
-        query = f"SELECT i.depot_id, depot.name, depot.address_id  FROM {self.farmer_info_view} as i JOIN depot ON i.depot_id = depot.depot.id"
+        query = f"SELECT i.depot_id, depot.name, depot.address_id  FROM {self.farmer_info_view} as i LEFT JOIN depot ON i.depot_id = depot.depot_id"
 
         print(query)
         return self.dql_to_dictList(query)
@@ -376,7 +384,7 @@ class FARMERdb(FTAKdb):
         return self.dql_to_dictList(query)
 
     def get_products(self):
-        query = f"SELECT p.product_id, p.name, p.description, p.rate, p.image_link FROM {self.farmer_info_view} as i JOIN product as p ON i.product_id = product.p.product_id"
+        query = f"SELECT p.product_id, p.name, p.description, p.rate, p.image_link FROM {self.farmer_info_view} as i LEFT JOIN product as p ON i.product_id = p.product_id"
         return self.dql_to_dictList(query)
         
 

@@ -128,7 +128,7 @@ def query():
 def plot():
     
     if request.method == "POST":
-        db.insert_plot(request.form['plot_size'], request.form['longitude'], request.form['latitude'])
+        db.insert_plot_request(request.form['plot_size'], request.form['longitude'], request.form['latitude'])
 
     return render_template('plot.html', result = db.get_plots())
 
@@ -138,7 +138,7 @@ def depot():
 
     if request.method == "POST":
         
-        db.insert_depot(request.form['depot_id'])
+        db.insert_depot_request(request.form['depot_id'])
 
     depots = db.get_all_depots()
     return render_template('depot.html',result = db.get_depots(),depots = depots)
@@ -149,9 +149,9 @@ def product():
 
     if request.method == "POST":
         if request.form['product'] == 'newProduct':
-            db.insert_new_product(request.form['product_name'], request.form['description'], request.form['rate'], request.form['image_link'])
+            db.insert_new_product_request(request.form['product_name'], request.form['description'], request.form['rate'], request.form['image_link'])
         else:
-            db.insert_product(request.form['product'], request.form['quantity'], request.form['depot_id'])
+            db.insert_product_request(request.form['product'], request.form['quantity'], request.form['depot_id'])
                 
     products = db.get_all_products()
     return render_template('product.html',result = db.get_products(),products = products)
