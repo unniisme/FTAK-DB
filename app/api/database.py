@@ -274,6 +274,7 @@ class FTAKdb(PostgresqlDB):
                 connection.execute(text(farmer_login_query))
                 print("Created farmer")
 
+                # Access all information about yourself
                 view_query=f"CREATE VIEW {username}_farmer_info AS \
                     SELECT f.*, fp.farmer_product_id, fp.product_id, fp.quantity, fp.depot_id, fpl.plot_id, fpl.plot_size, fpl.longitude, fpl.latitude \
                     FROM farmer f \
@@ -283,6 +284,14 @@ class FTAKdb(PostgresqlDB):
                 connection.execute(text(view_query))
                 print("Created view")
 
+                # Access all information about the requests that you have made
+                request_view_query=f"CREATE VIEW {username}_requests AS \
+                    SELECT fpla.*, fda.*, fpra.*\
+                    FROM farmer \
+                    LEFT JOIN farmer_plot_approval fpla ON fpla.farmer_id = farmer.farmer_id \
+                    LEFT JOIN farmer_depot_approval fda ON fda.farmer_id = farmer.farmer_id \
+                    LEFT JOIN farmer_product_approval fpra ON fpra.farmer_id = farmer.farmer_id \
+                    WHERE farmer.farmer_id = {new_farmer_id}"
 
 
                 permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
@@ -372,17 +381,17 @@ class FARMERdb(FTAKdb):
         
 
     # DD DM
-    def insert_plot(self, plot_size, longitude, latitude):
+    def insert_plot_request(self, plot_size, longitude, latitude):
         query = f"INSERT INTO farmer_plot_approval (farmer_id, plot_size, longitude, latitude, approved, entry_time) \
             VALUES ({self.get_details()['farmer_id']}, {plot_size}, {longitude}, {latitude}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
 
-    def insert_depot(self, depot_id):
+    def insert_depot_request(self, depot_id):
         query = f"INSERT INTO farmer_depot_approval (farmer_id, depot_id, approved, entry_time) \
                 VALUES ({self.get_details()['farmer_id']}, {depot_id}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
 
-    def insert_product(self, product_id, quantity, depot_id):
-        query = f"INSERT INTO farmer_product_approval (farmer_id, product_id, quantity, depot_id, approved, entry_time) \
-                VALUES ({self.get_details()['farmer_id']}, {product_id}, {quantity}, {depot_id}, FALSE, NOW());"
+    def insert_product_request(self, product_name, description, rate, image_link, quantity, depot_id):
+        query = f"INSERT INTO farmer_product_approval (farmer_id, name, description, rate, image_link, quantity, depot_id, approved, entry_time) \
+                VALUES ({self.get_details()['farmer_id']}, {product_name}, {description}, {rate}, {image_link}, {quantity}, {depot_id}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
