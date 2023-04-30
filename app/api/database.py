@@ -352,10 +352,26 @@ class INSPECTORdb(FTAKdb):
     def update_farmer_product(self):
         self.execute_ddl_and_dml_commands("SELECT approve_farmer_product_requests()")
 
+    def approve_new_farmer_product(self, entry_id):
+        query = f"UPDATE new_product_approval SET approved = TRUE WHERE id = {entry_id}"
+
+        self.execute_ddl_and_dml_commands(query)
+
+    def update_farmer_product(self):
+        self.execute_ddl_and_dml_commands("SELECT insert_approved_products()")
+
     def getApprovalList(self, tableName):
+        """
+        table names can be plot, depot, product or new_product
+        """
         if tableName not in ["plot", "depot", "product"]:
             print("Unknown table")
             return -1
+
+        if tableName == "new_product":
+            query = f"SELECT * FROM {tableName}_approval"
+            return self.dql_to_tupleList(query)
+
 
         query = f"SELECT * FROM farmer_{tableName}_approval"
         return self.dql_to_tupleList(query)
