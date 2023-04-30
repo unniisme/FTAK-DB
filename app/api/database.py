@@ -303,14 +303,7 @@ class FTAKdb(PostgresqlDB):
 
 
                 permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
-                    GRANT INSERT ON farmer_plot_approval TO {username}; \
-                    GRANT INSERT ON farmer_depot_approval TO {username}; \
-                    GRANT INSERT ON farmer_product_approval TO {username}; \
-                    GRANT SELECT ON product TO {username}; \
-                    GRANT SELECT ON country TO {username}; \
-                    GRANT SELECT ON city TO {username}; \
-                    GRANT SELECT ON address TO {username}; \
-                    GRANT SELECT ON depot TO {username}"
+                    GRANT Farmer TO {username}"
                 connection.execute(text(permissions_query))
                 print("Granted permissions")
 

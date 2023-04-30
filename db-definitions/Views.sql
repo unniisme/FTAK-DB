@@ -23,6 +23,8 @@ GRANT SELECT ON city TO Farmer;
 GRANT SELECT ON address TO Farmer;
 GRANT SELECT ON depot TO Farmer;
 
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to Farmer;
+
 --Supervisor
 CREATE USER Supervisor;
 
