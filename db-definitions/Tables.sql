@@ -164,7 +164,7 @@ CREATE TABLE farmer_product_approval (
   FOREIGN KEY (product_id) REFERENCES product (product_id),
   FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
 
-  approved BOOLEAN,
+  approved BOOLEAN NOT NULL,
   entry_time timestamp
 );
 
@@ -178,6 +178,6 @@ CREATE TABLE new_product_approval (
   image_link VARCHAR(50),
   FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
 
-  approved BOOLEAN,
+  approved BOOLEAN NOT NULL,
   entry_time timestamp
 );
