@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "Entering FTAK-db"
+
+alias test="flask run --host=0.0.0.0 -p 5512 --debug"
+alias host="flask run --host=0.0.0.0 -p 5512"
+
+alias pg="psql -U postgres -d ftak"
+
+db(){
+    psql -U $1 -d ftak
+}
