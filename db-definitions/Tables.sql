@@ -172,12 +172,3 @@ CREATE TABLE new_product_approval (
   approved BOOLEAN,
   entry_time timestamp
 );
-
-CREATE TABLE product (
-  product_id SERIAL,
-  name VARCHAR(100) NOT NULL,
-  description TEXT,
-  rate DECIMAL(10,2) NOT NULL,
-  image_link VARCHAR(50),
-  PRIMARY KEY (product_id)
-);
