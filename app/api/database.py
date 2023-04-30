@@ -399,7 +399,12 @@ class FARMERdb(FTAKdb):
                 VALUES ({self.get_details()['farmer_id']}, {depot_id}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
 
-    def insert_product_request(self, product_name, description, rate, image_link, quantity, depot_id):
-        query = f"INSERT INTO farmer_product_approval (farmer_id, name, description, rate, image_link, quantity, depot_id, approved, entry_time) \
-                VALUES ({self.get_details()['farmer_id']}, {product_name}, {description}, {rate}, {image_link}, {quantity}, {depot_id}, FALSE, NOW());"
+    def insert_product_request(self, product_id, quantity, depot_id):
+        query = f"INSERT INTO farmer_product_approval (farmer_id, product_id, quantity, depot_id, approved, entry_time) \
+                VALUES ({self.get_details()['farmer_id']}, {product_id}, {quantity}, {depot_id}, FALSE, NOW());"
+        self.execute_ddl_and_dml_commands(query)
+
+    def insert_new_product_request(self, product_name, description, rate, image_link, quantity, depot_id):
+        query = f"INSERT INTO new_product_approval (farmer_id, name, description, rate, image_link, approved, entry_time) \
+                VALUES ({self.get_details()['farmer_id']}, {product_name}, {description}, {rate}, {image_link}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
