@@ -286,7 +286,14 @@ class FTAKdb(PostgresqlDB):
 
 
                 permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
-                    GRANT farmer TO {username};"
+                    GRANT INSERT ON farmer_plot_approval TO {username}; \
+                    GRANT INSERT ON farmer_depot_approval TO {username}; \
+                    GRANT INSERT ON farmer_product_approval TO {username}; \
+                    GRANT SELECT ON product TO {username}; \
+                    GRANT SELECT ON country TO {username}; \
+                    GRANT SELECT ON city TO {username}; \
+                    GRANT SELECT ON address TO {username}; \
+                    GRANT SELECT ON depot TO {username}"
                 connection.execute(text(permissions_query))
                 print("Granted permissions")
 
@@ -303,14 +310,6 @@ class FTAKdb(PostgresqlDB):
         return 0
 
 class INSPECTORdb(FTAKdb):
-
-    def get_approval_list(self, tableName):
-        if tableName not in ["plot", "depot", "product"]:
-            print("Unknown table")
-            return -1
-
-        query = f"SELECT * FROM farmer_{tableName}_approval"
-        return self.dql_to_tupleList(query)
 
     def approve_farmer_plot(self, entry_id):
         query = f"UPDATE farmer_plot_approval SET approved = TRUE WHERE id = {entry_id}"
@@ -336,6 +335,14 @@ class INSPECTORdb(FTAKdb):
     def update_farmer_product(self):
         self.execute_ddl_and_dml_commands("SELECT approve_farmer_product_requests()")
 
+    def getApprovalList(self, tableName):
+        if tableName not in ["plot", "depot", "product"]:
+            print("Unknown table")
+            return -1
+
+        query = f"SELECT * FROM farmer_{tableName}_approval"
+        return self.dql_to_tupleList(query)
+
 
 class FARMERdb(FTAKdb):
 
@@ -350,7 +357,9 @@ class FARMERdb(FTAKdb):
         return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.farmer_info_view};")[0]
 
     def get_depots(self):
-        query = f"SELECT i.depot_id, depot.name, depot.address_id FROM {self.farmer_info_view} as i LEFT JOIN depot ON i.depot_id = depot.depot_id"
+        query = f"SELECT i.depot_id, depot.name, depot.address_id  FROM {self.farmer_info_view} as i JOIN depot ON i.depot_id = depot.depot.id"
+
+        print(query)
         return self.dql_to_dictList(query)
 
     def get_plots(self):
@@ -358,7 +367,7 @@ class FARMERdb(FTAKdb):
         return self.dql_to_dictList(query)
 
     def get_products(self):
-        query = f"SELECT p.product_id, p.name, p.description, p.rate, p.image_link FROM {self.farmer_info_view} as i LEFT JOIN product as p ON i.product_id = p.product_id"
+        query = f"SELECT p.product_id, p.name, p.description, p.rate, p.image_link FROM {self.farmer_info_view} as i JOIN product as p ON i.product_id = product.p.product_id"
         return self.dql_to_dictList(query)
         
 

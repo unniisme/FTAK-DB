@@ -28,5 +28,23 @@
       {% endfor %}
     </tbody>
   </table>
+
+<br>
+<br>
+<br>
+
+<form class="login-form" method="post">
+    <h1>Insert Depot</h1>
+   
+    <label for="depot">Select a Depot:</label>
+    <select name="depot" id="depot">
+        {% for d in depots %}
+            <option value="{{ d['id'] }}">{{ d['name'] }}</option>
+        {% endfor %}
+    </select>
+
+    <input class = "button" type="submit" value="Submit">
+</form>
+
 </body>
 </html>

@@ -28,5 +28,55 @@
       {% endfor %}
     </tbody>
   </table>
+
+<br>
+<br>
+<br>
+
+<form class="login-form" method="post">
+    <h1>Insert Product</h1>
+   
+    <label for="product">Select a Product:</label>
+    <select name="product" id="product" onchange="showNewProductForm(this.value)">
+        {% for p in products %}
+            <option value="{{ p['id'] }}">{{ p['name'] }}</option>
+        {% endfor %}
+        <option value="newProduct">New Product</option>
+    </select>
+
+    <div id="newProductForm" style="display: none;">
+        <div>
+            <label for="product_name">Product Name:</label>
+            <input type="text" name="product_name" id="product_name">
+        </div>
+        <div>
+            <label for="description">Description:</label>
+            <input type="text" name="description" id="description">
+        </div>
+        <div>
+            <label for="rate">Rate:</label>
+            <input type="number" name="rate" id="rate">
+        </div>
+        <div>
+            <label for="image_link">Image Link:</label>
+            <input type="text" name="image_link" id="image_link">
+        </div>
+    </div>
+    
+    <script>
+        function showNewProductForm(value) {
+            if (value === "newProduct") {
+                document.getElementById("newProductForm").style.display = "block";
+            } else {
+                document.getElementById("newProductForm").style.display = "none";
+            }
+        }
+    </script>
+
+    <input class="button" type="submit" value="Submit">
+</form>
+
+
+
 </body>
 </html>

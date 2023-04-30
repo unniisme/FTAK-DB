@@ -117,11 +117,13 @@ def farmer():
 @app.route('/farmer/query',methods=['GET'])
 def query():
     query = request.args.get('query')
-    result = db.dql_to_dictList(query)
-    if result == None:
-        return "Invalid Query"
-    return render_template('query.html', query = query, result = result)
 
+    try:
+        result = db.dql_to_dictList(query)
+        return render_template('query.html', query = query, result = result)
+    except Exception as e:
+        return str(e)
+    
 @app.route('/farmer/plot', methods=['GET', 'POST'])
 def plot():
     
@@ -135,18 +137,24 @@ def plot():
 def depot():
 
     if request.method == "POST":
+        
         db.insert_depot(request.form['depot_id'])
 
-    return render_template('dept.html',result = db.get_depots())
+    depots = db.get_all_depots()
+    return render_template('depot.html',result = db.get_depots(),depots = depots)
 
 
 @app.route('/farmer/product', methods=['GET', 'POST'])
 def product():
 
     if request.method == "POST":
-        db.insert_product(request.form['product_id'], request.form['quantity'], request.form['depot_id'])
-
-    return render_template('product.html',result = db.get_products())
+        if request.form['product'] == 'newProduct':
+            db.insert_new_product(request.form['product_name'], request.form['description'], request.form['rate'], request.form['image_link'])
+        else:
+            db.insert_product(request.form['product'], request.form['quantity'], request.form['depot_id'])
+                
+    products = db.get_all_products()
+    return render_template('product.html',result = db.get_products(),products = products)
     # code for farmer's product page       
 
 if __name__ == '__main__':
