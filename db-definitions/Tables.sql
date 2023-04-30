@@ -136,7 +136,7 @@ CREATE TABLE farmer_plot_approval (
   latitude NUMERIC NOT NULL,
   FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
 
-  approved BOOLEAN,
+  approved BOOLEAN NOT NULL,
   entry_time timestamp
 );
 
@@ -148,7 +148,7 @@ CREATE TABLE farmer_depot_approval (
   FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
   FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
 
-  approved BOOLEAN,
+  approved BOOLEAN NOT NULL,
   entry_time timestamp
 );
 
