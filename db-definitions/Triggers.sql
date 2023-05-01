@@ -1,5 +1,54 @@
 --Trigger definitions
 
+-- Farmer plot approval
+CREATE OR REPLACE FUNCTION approve_farmer_plot_requests() RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.approved THEN
+        INSERT INTO farmer_plot (farmer_id, plot_size, longitude, latitude)
+        VALUES (NEW.farmer_id, NEW.plot_size, NEW.longitude, NEW.latitude);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER approve_farmer_plot_trigger
+    AFTER UPDATE OF approved ON farmer_plot_approval
+    FOR EACH ROW
+    EXECUTE FUNCTION approve_farmer_plot_requests();
+
+--Farmer Depot approval
+CREATE OR REPLACE FUNCTION approve_farmer_depot_requests() RETURNS TRIGGER AS $$ 
+BEGIN
+  IF NEW.approved THEN
+    INSERT INTO farmer_depot (farmer_id, depot_id)
+    VALUES (NEW.farmer_id, NEW.depot_id);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER approve_farmer_depot_trigger
+    AFTER UPDATE OF approved ON farmer_depot_approval
+    FOR EACH ROW
+    EXECUTE FUNCTION approve_farmer_depot_requests();
+
+-- Farmer Product approval
+CREATE OR REPLACE FUNCTION approve_farmer_product_requests() RETURNS TRIGGER AS $$ 
+BEGIN
+  IF NEW.approved THEN
+    INSERT INTO farmer_product (farmer_id, product_id, quantity, depot_id)
+    VALUES (NEW.farmer_id, NEW.product_id, NEW.quantity, NEW.depot_id);
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER approve_farmer_product_trigger
+    AFTER UPDATE OF approved ON farmer_product_approval
+    FOR EACH ROW
+    EXECUTE FUNCTION approve_farmer_product_requests();
+
+
 -- Trade quantity
 CREATE OR REPLACE FUNCTION check_trade_quantity() 
 RETURNS TRIGGER AS 

@@ -182,3 +182,17 @@ CREATE TABLE new_product_approval (
   approved BOOLEAN NOT NULL,
   entry_time timestamp
 );
+
+CREATE TABLE trade_request (
+  id SERIAL PRIMARY KEY,
+  product_id INT NOT NULL, 
+  quantity INT NOT NULL,
+  depot_id INT NOT NULL,
+  unit_rate DECIMAL(10,2) NOT NULL,
+
+  FOREIGN KEY (product_id) REFERENCES product (product_id),
+  FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
+
+  approved BOOLEAN NOT NULL,
+  entry_time timestamp
+)

@@ -298,10 +298,11 @@ class FTAKdb(PostgresqlDB):
 
                 # Access all information about yourself
                 view_query=f"CREATE VIEW {username}_farmer_info AS \
-                    SELECT f.*, fp.farmer_product_id, fp.product_id, fp.quantity, fp.depot_id, fpl.plot_id, fpl.plot_size, fpl.longitude, fpl.latitude \
+                    SELECT f.*, fp.farmer_product_id, fp.product_id, fp.quantity, fd.depot_id, fpl.plot_id, fpl.plot_size, fpl.longitude, fpl.latitude \
                     FROM farmer f \
                     LEFT JOIN farmer_plot fpl ON fpl.farmer_id = f.farmer_id \
                     LEFT JOIN farmer_product fp ON fp.farmer_id = f.farmer_id \
+                    LEFT JOIN farmer_depot df ON fd.farmer_id = f.farmer_id \
                     WHERE f.farmer_id = {new_farmer_id}"
                 connection.execute(text(view_query))
                 print("Created view")
@@ -370,24 +371,24 @@ class INSPECTORdb(FTAKdb):
 
         self.execute_ddl_and_dml_commands(query)
 
-    def update_farmer_plot(self):
-        self.execute_ddl_and_dml_commands("SELECT approve_farmer_plot_requests()")
+    # def update_farmer_plot(self):
+    #     self.execute_ddl_and_dml_commands("SELECT approve_farmer_plot_requests()")
 
     def approve_farmer_depot(self, entry_id):
         query = f"UPDATE farmer_depot_approval SET approved = TRUE WHERE id = {entry_id}"
 
         self.execute_ddl_and_dml_commands(query)
 
-    def update_farmer_depot(self):
-        self.execute_ddl_and_dml_commands("SELECT approve_farmer_depot_requests()")
+    # def update_farmer_depot(self):
+    #     self.execute_ddl_and_dml_commands("SELECT approve_farmer_depot_requests()")
 
     def approve_farmer_product(self, entry_id):
         query = f"UPDATE farmer_product_approval SET approved = TRUE WHERE id = {entry_id}"
 
         self.execute_ddl_and_dml_commands(query)
 
-    def update_farmer_product(self):
-        self.execute_ddl_and_dml_commands("SELECT approve_farmer_product_requests()")
+    # def update_farmer_product(self):
+    #     self.execute_ddl_and_dml_commands("SELECT approve_farmer_product_requests()")
 
     def approve_new_farmer_product(self, entry_id):
         query = f"UPDATE new_product_approval SET approved = TRUE WHERE id = {entry_id}"
@@ -429,7 +430,6 @@ class FARMERdb(FTAKdb):
     def get_depots(self):
         query = f"SELECT i.depot_id, depot.name, depot.address_id  FROM {self.farmer_info_view} as i LEFT JOIN depot ON i.depot_id = depot.depot_id"
 
-        print(query)
         return self.dql_to_dictList(query)
 
     def get_plots(self):
