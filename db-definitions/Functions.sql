@@ -11,6 +11,8 @@ BEGIN
   FROM farmer_plot_approval
   WHERE approved IS TRUE;
 
+  DELETE FROM farmer_plot_approval
+  WHERE approved IS TRUE;
 END;
 $$
 LANGUAGE plpgsql;
@@ -22,6 +24,9 @@ BEGIN
   INSERT INTO farmer_depot (farmer_id, depot_id)
   SELECT farmer_id, depot_id
   FROM farmer_product_approval
+  WHERE approved IS TRUE;
+
+  DELETE FROM farmer_product_approval
   WHERE approved IS TRUE;
 END;
 $$ LANGUAGE plpgsql;
@@ -36,6 +41,8 @@ BEGIN
   FROM farmer_product_approval
   WHERE approved IS TRUE;
 
+  DELETE FROM farmer_product_approval
+  WHERE approved IS TRUE;
 END;
 $$
 LANGUAGE plpgsql;
@@ -47,6 +54,9 @@ BEGIN
   INSERT INTO product (name, description, rate, image_link)
   SELECT name, description, rate, image_link
   FROM new_product_approval
+  WHERE approved = TRUE;
+
+  DELETE FROM new_product_approval
   WHERE approved = TRUE;
 END;
 $$ LANGUAGE plpgsql;
