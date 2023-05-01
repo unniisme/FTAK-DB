@@ -181,6 +181,13 @@ class FTAKdb(PostgresqlDB):
         # Return ID
         return self.dql_to_dictList(f"SELECT farmer_id FROM farmer WHERE first_name='{first_name}' AND last_name='{last_name}' AND phone_number='{phone_number}'")[0]['farmer_id']
 
+    def insert_customer(self, username, first_name, last_name, email,phone_number):
+        query=f"INSERT INTO customer(customer_username,first_name, last_name, email, phone_number) \
+            VALUES ('{username}','{first_name}', '{last_name}', '{email}', {phone_number})"
+
+        self.execute_ddl_and_dml_commands(query)
+        print("Inserted customer")
+
     def insert_address(self, country, city=None, street_name=None, street_number=None, postal_code=None):
         if city==None or len(self.dql_to_dictList(f"SELECT * FROM country WHERE name='{country}'")) == 0:
             if len(self.dql_to_dictList(f"SELECT * FROM country WHERE name='{country}'")) > 0:
@@ -263,7 +270,7 @@ class FTAKdb(PostgresqlDB):
         #     return None
 
         return db
-
+    
 
     def farmer_sign_up(self, username, password, first_name, last_name, DoB, DoJ, phone_number, address_id):
         if len(self.dql_to_dictList(f"SELECT * FROM farmer_login WHERE username='{username}'")) != 0:
@@ -304,6 +311,39 @@ class FTAKdb(PostgresqlDB):
 
                 permissions_query=f"GRANT SELECT, INSERT, UPDATE, DELETE ON {username}_farmer_info TO {username}; \
                     GRANT Farmer TO {username}"
+                connection.execute(text(permissions_query))
+                print("Granted permissions")
+
+                connection.execute(text("COMMIT;"))
+                connection.execute(text("END;"))
+
+                trans.commit()
+
+            except Exception as e:
+                trans.rollback()
+                print("Rolling Back")
+                print(e)
+
+        return 0
+    
+    def customer_sign_up(self, username, password, first_name, last_name, email, phone_number):
+        if len(self.dql_to_dictList(f"SELECT * FROM customer_login WHERE username='{username}'")) != 0:
+            print("User already exists")
+            return -1
+
+        with self.engine.connect() as connection:
+            trans = connection.begin()
+            try:                
+                role_query = f"CREATE ROLE {username} LOGIN PASSWORD '{password}'"
+                connection.execute(text(role_query))
+                print("Created role", username)
+
+                new_customer_id = self.insert_customer(username, first_name, last_name, email, phone_number) #to do insert customer
+                customer_login_query = f"INSERT INTO customer_login VALUES('{username}', {new_customer_id})"
+                connection.execute(text(customer_login_query))
+                print("Created customer")
+
+                permissions_query=f"GRANT Customer TO {username}"
                 connection.execute(text(permissions_query))
                 print("Granted permissions")
 
@@ -415,5 +455,32 @@ class FARMERdb(FTAKdb):
 
     def insert_new_product_request(self, product_name, description, rate, image_link, quantity, depot_id):
         query = f"INSERT INTO new_product_approval (farmer_id, name, description, rate, image_link, approved, entry_time) \
-                VALUES ({self.get_details()['farmer_id']}, {product_name}, {description}, {rate}, {image_link}, FALSE, NOW());"
+                VALUES ({self.get_details()['farmer_id']}, '{product_name}', '{description}', {rate}, {image_link}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
+
+
+class CUSTOMERdb(FTAKdb):
+
+    def __init__(self, username, password, host, port):
+
+        super().__init__(username, password, host, port)
+
+        self.customer_info_view = (self.user_name) + "_customer_info"
+
+    # DQ
+    def get_details(self):
+        return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.customer_info_view};")[0]
+
+    def get_depots(self):
+        query = f"SELECT depot_id, name, address_id  FROM depot"
+
+        print(query)
+        return self.dql_to_dictList(query)
+
+    def get_products(self):
+        query = f"SELECT product_id, name, description, rate, image_link FROM product"
+        return self.dql_to_dictList(query)
+        
+
+    # DD DM
+    
