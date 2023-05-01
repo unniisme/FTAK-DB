@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static',filename='css/farmer.css') }}">
+    </head>
+    <body>
+        <p>Logged in as {{username}}</p>
+        
+        <form method="POST">
+            <button class="button" name="action" value="plot">Plots</button>
+            <button class="button" name="action" value="depot">Depots</button>
+            <button class="button" name="action" value="product">Products</button>        
+        </form>
+
+        <form class="query-form" method="POST">
+            <label for="query" id="query">SQL Query</label>
+            <input type="text" id="query" name="query">
+            <button class="button" name="action" value="query">Submit</button>
+
+        </form>
+    </body>

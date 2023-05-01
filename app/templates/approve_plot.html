@@ -1,0 +1,45 @@
+<link rel="stylesheet" href="{{ url_for('static',filename='css/query.css') }}">
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Approve Plots</title>
+  </head>
+  <body>
+    <h1>Approve Plots</h1>
+
+    <form action="/approve_plot" method="POST">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <tH>Farmer ID</tH>
+              <th>Size</th>
+              <th>Longitude</th>
+              <th>Latitude</th>
+              <th>Approved</th>
+              <th>APPROVE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in result %}
+            {% if not row['approved'] %}
+            <tr>
+              <td>{{ row['id'] }}</td>
+              <td>{{ row['farmer_id'] }}</td>
+              <td>{{ row['plot_size'] }}</td>
+              <td>{{ row['longitude'] }}</td>
+              <td>{{ row['latitude'] }}</td>
+              <td>{{ row['approved'] }}</td>
+              <td><input type="checkbox" name="plot_ids[]" value="{{ row['plot_id'] }}"></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+        <button class="button" type="submit">Submit</button>
+      </form>
+      
+
+  </body>
+</html>

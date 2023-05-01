@@ -363,11 +363,11 @@ class INSPECTORdb(FTAKdb):
 
         if tableName == "new_product":
             query = f"SELECT * FROM {tableName}_approval"
-            return self.dql_to_tupleList(query)
+            return self.dql_to_dictList(query)
 
 
         query = f"SELECT * FROM farmer_{tableName}_approval"
-        return self.dql_to_tupleList(query)
+        return self.dql_to_dictList(query)
 
 
 class FARMERdb(FTAKdb):

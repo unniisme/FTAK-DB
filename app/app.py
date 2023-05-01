@@ -155,7 +155,53 @@ def product():
                 
     products = db.get_all_products()
     return render_template('product.html',result = db.get_products(),products = products)
-    # code for farmer's product page       
+    # code for farmer's product page     
+
+
+@app.route('/inspector',methods=['POST', "GET"])
+def inspector():
+    try:
+        if request.method == "POST":
+            if request.form['action'] == 'plot':
+                return redirect(url_for('approveplot'))
+            elif request.form['action'] == 'depot':
+                return redirect(url_for('approvedepot'))
+            elif request.form['action'] == 'product':
+                return redirect(url_for('approveproduct'))
+            elif request.form['action'] == 'query':
+                return redirect(url_for('query',query = request.form['query']))
+
+        return render_template('inspector.html', username = db.user_name)
+        
+    except:
+        return "Not logged in"     
+    
+    
+@app.route('/inspector/approveplot', methods=['GET', 'POST'])
+def approveplot():
+    if request.method == 'POST':
+        print("here")
+        plot_ids = request.form.getlist('plot_ids[]')
+        # plot_ids is a list of plot IDs that were checked
+        for plot_id in plot_ids:
+            db.approve_farmer_plot(plot_id)
+        return 'Plots approved successfully!'
+    return render_template('approve_plot.html', result = db.getApprovalList('plot'))
+
+
+@app.route('/inspector/approvedepot', methods=['GET', 'POST'])
+def approvedepot():
+
+    return render_template('approve_depot.html', result = db.getApprovalList('depot'))
+
+
+@app.route('/incpector/approveproduct', methods=['GET', 'POST'])
+def approveproduct():
+
+   return render_template('approve_plot.html', result = db.getApprovalList('product'))
+    # code for farmer's product page     
+
+
 
 if __name__ == '__main__':
     app.run()
