@@ -262,12 +262,19 @@ class FTAKdb(PostgresqlDB):
         return db
 
     def customer_login(username, password, host, port):
-        db = FTAKdb(username, password, host, port)
+        db = FTAKdb(admin_username, admin_password, host, port)
 
-        ## Dk what restriction rn
-        # if db.execute_dql_commands("SELECT * FROM ") == None:
-        #     #Unknown password
-        #     return None
+        if (len(db.dql_to_dictList(f"SELECT * FROM customer WHERE customer_username='{username}'")) == 0):
+            #Unknown username
+            print("unknown username")
+            return None
+
+        db = CUSTOMERdb(username, password, host, port)
+        # Customer has access to depot table
+        if db.execute_dql_commands("SELECT * FROM depot") == None:
+            #Unknown password
+            print("unknown password")
+            return None
 
         return db
     
@@ -327,7 +334,7 @@ class FTAKdb(PostgresqlDB):
         return 0
     
     def customer_sign_up(self, username, password, first_name, last_name, email, phone_number):
-        if len(self.dql_to_dictList(f"SELECT * FROM customer_login WHERE username='{username}'")) != 0:
+        if len(self.dql_to_dictList(f"SELECT * FROM customer WHERE customer_username='{username}'")) != 0:
             print("User already exists")
             return -1
 
@@ -339,9 +346,6 @@ class FTAKdb(PostgresqlDB):
                 print("Created role", username)
 
                 new_customer_id = self.insert_customer(username, first_name, last_name, email, phone_number) #to do insert customer
-                customer_login_query = f"INSERT INTO customer_login VALUES('{username}', {new_customer_id})"
-                connection.execute(text(customer_login_query))
-                print("Created customer")
 
                 permissions_query=f"GRANT Customer TO {username}"
                 connection.execute(text(permissions_query))
@@ -465,11 +469,11 @@ class CUSTOMERdb(FTAKdb):
 
         super().__init__(username, password, host, port)
 
-        self.customer_info_view = (self.user_name) + "_customer_info"
+        # self.customer_info_view = (self.user_name) + "_customer_info"
 
     # DQ
-    def get_details(self):
-        return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.customer_info_view};")[0]
+    # def get_details(self):
+    #     return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.customer_info_view};")[0]
 
     def get_depots(self):
         query = f"SELECT depot_id, name, address_id  FROM depot"

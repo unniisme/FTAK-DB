@@ -52,3 +52,11 @@ GRANT SELECT ON farmer_depot_info TO Supervisor;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO supervisor;
 REVOKE INSERT, UPDATE, DELETE ON trade FROM supervisor;
+
+
+-- Customer
+CREATE USER Customer;
+
+GRANT SELECT ON depot TO Customer;
+GRANT SELECT ON product TO Customer;
+GRANT SELECT ON address TO Customer;

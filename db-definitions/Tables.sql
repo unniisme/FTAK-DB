@@ -96,11 +96,12 @@ CREATE TABLE city (
 
 CREATE TABLE customer (
   customer_id SERIAL,
+  customer_username VARCHAR(50) NOT NULL,
   first_name VARCHAR(50) NOT NULL,
   last_name VARCHAR(50) NOT NULL,
   email VARCHAR(100) NOT NULL,
   phone_number VARCHAR(20) NOT NULL,
-  PRIMARY KEY (customer_id)
+  PRIMARY KEY (customer_id, customer_username)
 );
 
 
