@@ -190,7 +190,6 @@ CREATE TABLE trade_request (
   product_id INT NOT NULL, 
   quantity INT NOT NULL,
   depot_id INT NOT NULL,
-  unit_rate DECIMAL(10,2) NOT NULL,
 
   FOREIGN KEY (customer_id) REFERENCES customer (customer_id),
   FOREIGN KEY (product_id) REFERENCES product (product_id),

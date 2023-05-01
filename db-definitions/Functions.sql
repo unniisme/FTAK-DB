@@ -41,8 +41,10 @@ BEGIN
             RAISE EXCEPTION 'No farmer has enough quantity of the product. Could not insert trade.';
         END IF;
 
-        INSERT INTO trade (farmer_product_id, customer_id, quantity, depot_id, unit_rate, amount, rate) VALUES (suitable_farmer_product_id, approved_rec.customer_id, approved_rec.quantity, approved_rec.depot_id, approved_rec.unit_rate, approved_rec.quantity * approved_rec.unit_rate, product_rate);
+        INSERT INTO trade (farmer_product_id, customer_id, quantity, depot_id, unit_rate, amount, rate) VALUES (suitable_farmer_product_id, approved_rec.customer_id, approved_rec.quantity, approved_rec.depot_id, product_rate, approved_rec.quantity * product_rate, product_rate);
     END LOOP;
+
+    DELETE FROM trade_request WHERE approved = TRUE;
 END;
 $$ LANGUAGE plpgsql;
 

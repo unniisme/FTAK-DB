@@ -269,12 +269,17 @@ class FTAKdb(PostgresqlDB):
             print("unknown username")
             return None
 
+        customer_id = db.dql_output_to_dictList(f"SELECT customer_id FROM customer WHERE customer_username='{username}'")[0]['customer_id']
+
         db = CUSTOMERdb(username, password, host, port)
+
         # Customer has access to depot table
         if db.execute_dql_commands("SELECT * FROM depot") == None:
             #Unknown password
             print("unknown password")
             return None
+
+        db.customer_id = customer_id
 
         return db
     
@@ -395,12 +400,12 @@ class INSPECTORdb(FTAKdb):
 
         self.execute_ddl_and_dml_commands(query)
 
-    def update_farmer_product(self):
+    def update_new_farmer_products(self):
         self.execute_ddl_and_dml_commands("SELECT insert_approved_products()")
 
     def getApprovalList(self, tableName):
         """
-        table names can be plot, depot, product or new_product
+        table names can be plot, depot, product, new_product
         """
         if tableName not in ["plot", "depot", "product"]:
             print("Unknown table")
@@ -414,6 +419,17 @@ class INSPECTORdb(FTAKdb):
         query = f"SELECT * FROM farmer_{tableName}_approval"
         return self.dql_to_dictList(query)
 
+    #--- Trade requests
+    def get_trade_requests(self):
+        return self.dql_to_dictList("SELECT * FROM trade_request")
+
+    def approve_trade_request(self, request_id):
+        query = f"UPDATE trade_request SET approved = TRUE WHERE id = {request_id}"
+
+        self.execute_ddl_and_dml_commands(query)
+
+    def update_trade(self):
+        self.execute_ddl_and_dml_commands("SELECT insert_approved_trades()")
 
 class FARMERdb(FTAKdb):
 
@@ -484,7 +500,11 @@ class CUSTOMERdb(FTAKdb):
     def get_products(self):
         query = f"SELECT product_id, name, description, rate, image_link FROM product"
         return self.dql_to_dictList(query)
-        
 
+        
     # DD DM
+    def insert_trade_request(self, product_id, quantity, depot_id):
+        query = f"INSERT INTO trade_request (customer_id, product_id, quantity, depot_id, approved, entry_time) \
+            VALUES ({self.customer_id}, {product_id}, {quantity}, {depot_id}, FALSE, NOW())"
+        self.execute_ddl_and_dml_commands(query)
     
