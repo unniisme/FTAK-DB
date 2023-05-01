@@ -67,6 +67,7 @@ CREATE TABLE trade (
   quantity INT NOT NULL,
   depot_id INT NOT NULL,
   unit_rate DECIMAL(10,2) NOT NULL,
+  amount DECIMAL(10, 2) NOT NULL, --ALTER TABLE trade ADD COLUMN amount DECIMAL(10, 2) NOT NULL
   rate DECIMAL(10,2) NOT NULL,
   PRIMARY KEY (trade_id)
 );
@@ -185,14 +186,16 @@ CREATE TABLE new_product_approval (
 
 CREATE TABLE trade_request (
   id SERIAL PRIMARY KEY,
+  customer_id INT NOT NULL,
   product_id INT NOT NULL, 
   quantity INT NOT NULL,
   depot_id INT NOT NULL,
   unit_rate DECIMAL(10,2) NOT NULL,
 
+  FOREIGN KEY (customer_id) REFERENCES customer (customer_id),
   FOREIGN KEY (product_id) REFERENCES product (product_id),
   FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
 
   approved BOOLEAN NOT NULL,
   entry_time timestamp
-)
+);

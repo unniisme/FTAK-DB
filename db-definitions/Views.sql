@@ -60,3 +60,4 @@ CREATE USER Customer;
 GRANT SELECT ON depot TO Customer;
 GRANT SELECT ON product TO Customer;
 GRANT SELECT ON address TO Customer;
+GRANT INSERT ON trade_request TO Customer;
