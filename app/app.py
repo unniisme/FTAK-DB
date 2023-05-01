@@ -151,12 +151,20 @@ def product():
 
     if request.method == "POST":
         if request.form['product'] == 'newProduct':
-            db.insert_new_product_request(request.form['product_name'], request.form['description'], request.form['rate'], request.form['image_link'])
+            product_id = request.form['product_name']
+            description =  request.form['description']
+            db.insert_new_product_request(product_id,description, request.form['rate'], request.form['image_link'],request.form['quantity'], request.form['depot_id'])
         else:
-            db.insert_product_request(request.form['product'], request.form['quantity'], request.form['depot_id'])
+            product_id = request.form['product']
+            quantity = request.form['quantity']
+            depot = request.form['depot_id']
+            print("product id="+str(product_id))
+            print("depot_id="+str(depot))
+            db.insert_product_request(product_id, quantity, depot)
                 
     products = db.get_all_products()
-    return render_template('product.html',result = db.get_products(),products = products)
+    depots = db.get_all_depots()
+    return render_template('product.html',result = db.get_products(),products = products, depots = depots)
     # code for farmer's product page     
 
 

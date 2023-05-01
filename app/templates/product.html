@@ -39,7 +39,7 @@
     <label for="product">Select a Product:</label>
     <select name="product" id="product" onchange="showNewProductForm(this.value)">
         {% for p in products %}
-            <option value="{{ p['id'] }}">{{ p['name'] }}</option>
+            <option value="{{ p['product_id'] }}">{{ p['name'] }}</option>
         {% endfor %}
         <option value="newProduct">New Product</option>
     </select>
@@ -63,6 +63,20 @@
         </div>
     </div>
     
+    <div>
+        <label for="quantity">Quantity:</label>
+        <input type="number" name="quantity" id="quantity">
+    </div>
+
+    <div>
+        <label for="depot_id">Select a Depot:</label>
+        <select name="depot_id" id="depot_id">
+            {% for d in depots %}
+                <option value="{{ d['depot_id'] }}">{{ d['name'] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
     <script>
         function showNewProductForm(value) {
             if (value === "newProduct") {
@@ -75,6 +89,7 @@
 
     <input class="button" type="submit" value="Submit">
 </form>
+
 
 
 
