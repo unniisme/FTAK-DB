@@ -35,7 +35,7 @@ def login():
     
     if 'signup' in request.form and request.form['signup'] == 'Signup':
         print("signup clicked")
-        return redirect(url_for("farmer_signup"))
+        return redirect(url_for(client+"_signup"))
 
     if 'username' in request.form:
         username = request.form['username']
@@ -52,6 +52,8 @@ def login():
             print("Unknown username or password")
         else:
             return redirect(url_for(client))
+        
+    
 
     return render_template('login.html',role = client)
 
@@ -92,6 +94,35 @@ def farmer_signup():
 
 
     return render_template('signup_farmer.html', countries=db.get_country_city_dict(), address_id = address_id)
+
+
+@app.route('/customer_signup', methods=['POST','GET'])
+def customer_signup():
+    global db
+
+    if request.method == "POST":
+        
+        # Handle user details
+        first_name = request.form["first_name"]
+        last_name = request.form["last_name"]
+        email = request.form["email"]
+        phone_number = request.form["phone_number"]
+        user_name = request.form["user_name"]
+        password1 = request.form["password"]
+        password2 = request.form["Confirmpassword"]
+
+        if password1 != password2:
+            flash("Passwords do not match.")
+            return redirect(request.url)
+        
+        # Insert customer into database
+        db.customer_sign_up(user_name, password1, first_name, last_name, DoB, DoJ, phone_number, address_id)
+
+
+        return redirect(url_for("login", role="customer"))
+
+
+    return render_template('signup_customer.html')
 
 @app.route('/farmer',methods=['POST', "GET"])
 def farmer():

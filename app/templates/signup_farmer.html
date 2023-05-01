@@ -37,6 +37,16 @@
         <input type="text" id="street_name" name="street_name" required><br>
         <input class="button" type="submit" value="Sign Up">
     </form>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flashes">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
     
    
 
