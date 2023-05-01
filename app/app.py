@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect,  url_for, flash
 from api.database import FTAKdb
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.config['FLASH_MESSAGE_DURATION'] = 10
 
 ## Dbdef
 #Defining Db Credentials
@@ -138,7 +140,7 @@ def depot():
 
     if request.method == "POST":
         
-        db.insert_depot_request(request.form['depot_id'])
+        db.insert_depot_request(request.form['depot'])
 
     depots = db.get_all_depots()
     return render_template('depot.html',result = db.get_depots(),depots = depots)
@@ -180,19 +182,30 @@ def inspector():
 @app.route('/inspector/approveplot', methods=['GET', 'POST'])
 def approveplot():
     if request.method == 'POST':
-        print("here")
-        plot_ids = request.form.getlist('plot_ids[]')
+        plot_ids = request.form.getlist('plot_ids')
+        if plot_ids:
         # plot_ids is a list of plot IDs that were checked
-        for plot_id in plot_ids:
-            db.approve_farmer_plot(plot_id)
-        return 'Plots approved successfully!'
-    return render_template('approve_plot.html', result = db.getApprovalList('plot'))
+            for plot_id in plot_ids:
+                db.approve_farmer_plot(plot_id)
+            flash('Selected plots have been approved!', 'success')
+        else:
+            flash('Please select at least one plot to approve.', 'warning')
+   
+    return render_template('approve_plot.html', result=db.getApprovalList('plot'))
 
 
 @app.route('/inspector/approvedepot', methods=['GET', 'POST'])
 def approvedepot():
-
-    return render_template('approve_depot.html', result = db.getApprovalList('depot'))
+    if request.method == 'POST':
+        depot_ids = request.form.getlist('depot_ids')
+        if depot_ids:
+            for depot_id in depot_ids:
+                db.approve_farmer_depot(depot_id)
+            flash('Selected depots have been approved!', 'success')
+        else:
+            flash('Please select at least one depot to approve.', 'warning')
+    result = db.getApprovalList('depot')
+    return render_template('approve_depot.html', result=result)
 
 
 @app.route('/incpector/approveproduct', methods=['GET', 'POST'])

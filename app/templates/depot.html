@@ -39,7 +39,7 @@
     <label for="depot">Select a Depot:</label>
     <select name="depot" id="depot">
         {% for d in depots %}
-            <option value="{{ d['id'] }}">{{ d['name'] }}</option>
+            <option value="{{ d['depot_id'] }}">{{ d['name'] }}</option>
         {% endfor %}
     </select>
 
