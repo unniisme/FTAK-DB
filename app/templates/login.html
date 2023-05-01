@@ -20,7 +20,7 @@
         <input class = "button" type="submit" value="Login">
     </form>
     
-    {% if role == "farmer" %}
+    {% if (role == "farmer") or (role == "customer") %}
     <form class="signup-form" method="post">
         <div class="signup-container">
             <input class="signup-button" type="submit" name="signup" value="Signup"></input>
