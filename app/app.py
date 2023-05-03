@@ -116,7 +116,7 @@ def customer_signup():
             return redirect(request.url)
         
         # Insert customer into database
-        db.customer_sign_up(user_name, password1, first_name, last_name, DoB, DoJ, phone_number, address_id)
+        db.customer_sign_up(user_name, password1, first_name, last_name, email, phone_number)
 
 
         return redirect(url_for("login", role="customer"))
