@@ -1,0 +1,87 @@
+<link rel="stylesheet" href="{{ url_for('static',filename='css/query.css') }}">
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Approve Trade Requests</title>
+  </head>
+  <body>
+    <h1>Trades</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer</th>
+          <th>Farmer</th>
+          <th>Product</th>
+          <th>Depot</th>
+          <th>Quantity</th>
+          <th>Unit Rate</th>
+          <th>Rate</th>
+          <th>Total Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in trade %}
+        {% if not row['approved'] %}
+        <tr>
+          <td>{{ row['trade_id'] }}</td>
+          <td>{{ row['customer_name'] }}</td>
+          <td>{{ row['farmer_name'] }}</td>
+          <td>{{ row['product_name'] }}</td>
+          <td>{{ row['depot_name'] }}</td>
+          <td>{{ row['quantity'] }}</td>
+          <td>{{ row['unit_rate'] }}</td>
+          <td>{{ row['rate'] }}</td>
+          <td>{{ row['total_amount'] }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+
+
+    <h1>Approve Trade Requests</h1>
+
+    <form action="/inspector/approvetrade" method="POST">
+      <table>
+        <thead>
+          <tr> 
+            <th>ID</th>
+            <th>Customer ID</th>
+            <th>Product ID</th>
+            <th>Quantity</th>
+            <th>APPROVE</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in result %}
+          {% if not row['approved'] %}
+          <tr>
+            <td>{{ row['id'] }}</td>
+            <td>{{ row['customer_id'] }}</td>
+            <td>{{ row['product_id'] }}</td>
+            <td>{{ row['quantity'] }}</td>
+            <td>{{ row['approved'] }}</td>
+            <td><input type="checkbox" name="request_ids" value="{{ row['id'] }}"></td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+      <button class="button" type="submit" name="action" value="submit">Submit</button>
+    </form>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+  </body>
+</html>

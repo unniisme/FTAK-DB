@@ -1,0 +1,35 @@
+<!-- Susaaaa frontendddd -->
+
+<link rel="stylesheet" href="{{ url_for('static',filename='css/query.css') }}">
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+
+<p>Query : {{ query }}</p>
+
+
+<br>
+
+<form class="login-form" method="post">
+    <h1>Request Trade</h1>
+    <label for="product">Select a Product:</label>
+    <select name="product" id="product">
+        {% for d in products %}
+            <option value="{{ d['product_id'] }}">{{ d['name'] }}</option>
+        {% endfor %}
+    </select>
+    
+    <div>
+        <label for="quantity">Quantity:</label>
+        <input type="number" name="quantity" id="quantity">
+    </div>
+
+    <input class = "button" type="submit" value="Submit">
+</form>
+
+</body>
+</html>
