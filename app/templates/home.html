@@ -19,6 +19,55 @@
                 <img class="bg-image{{i}}" src="{{ url_for('static', filename='floating/' + i|string + '.png') }}" alt="Background Image">
             {% endfor %}
         </div>
+
+        <script>
+            // Get all the background images
+            var bgImages = document.querySelectorAll('.bg-images img');
+          
+            // Define the animation for each image
+            bgImages.forEach(function(image) {
+              // Get a random position for the image
+              var xPos = Math.floor(Math.random() * window.innerWidth);
+              var yPos = Math.floor(Math.random() * window.innerHeight);
+              // Set the initial position and z-index of the image
+              image.style.left = xPos + 'px';
+              image.style.top = yPos + 'px';
+              image.style.zIndex = '-1';
+          
+              // Define the animation for the image
+              var duration = Math.floor(Math.random() * 20) + 10; // Duration between 10 and 30 seconds
+              var delay = Math.floor(Math.random() * 10); // Delay between 0 and 10 seconds
+              var direction = Math.floor(Math.random() * 360); // Random starting direction
+              var rotation = Math.floor(Math.random() * 360); // Random starting rotation
+              var rotationSpeed = Math.floor(Math.random() * 10) - 5; // Random rotation speed between -5 and 5 degrees per second
+              var distance = Math.floor(Math.random() * 300) + 200; // Distance between 200 and 500 pixels
+              var endX = xPos + (Math.sin(direction * Math.PI / 180) * distance);
+              var endY = yPos + (Math.cos(direction * Math.PI / 180) * distance);
+          
+              var keyframes = [
+                { left: xPos + 'px', top: yPos + 'px', transform: 'rotate(' + rotation + 'deg)' },
+                { left: endX + 'px', top: endY + 'px', transform: 'rotate(' + (rotation + 360) + 'deg)' }
+              ];
+          
+              var options = {
+                duration: duration * 1000,
+                delay: delay * 1000,
+                iterations: Infinity,
+                easing: 'linear'
+              };
+          
+              var animation = image.animate(keyframes, options);
+          
+              // Update the rotation of the image every second
+              setInterval(function() {
+                rotation += rotationSpeed;
+                image.style.transform = 'rotate(' + rotation + 'deg)';
+              }, 1000);
+            });
+          </script>
+          
+        
+        
         
         
         

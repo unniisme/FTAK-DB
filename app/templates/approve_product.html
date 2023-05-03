@@ -1,0 +1,55 @@
+<link rel="stylesheet" href="{{ url_for('static',filename='css/query.css') }}">
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Approve Products</title>
+  </head>
+  <body>
+    <h1>Approve Products</h1>
+
+    <form action="/inspector/approveproduct" method="POST">
+      <table>
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>Farmer ID</th>
+                  <th>Product ID</th>
+                  <th>Quantity</th>
+                  <th>Depot ID</th>
+                  <th>Approved</th>
+                  <th>APPROVE</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for row in result %}
+              {% if not row['approved'] %}
+              <tr>
+                  <td>{{ row['id'] }}</td>
+                  <td>{{ row['farmer_id'] }}</td>
+                  <td>{{ row['product_id'] }}</td>
+                  <td>{{ row['quantity'] }}</td>
+                  <td>{{ row['depot_id'] }}</td>
+                  <td>{{ row['approved'] }}</td>
+                  <td><input type="checkbox" name="product_ids" value="{{ row['id'] }}"></td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+          </tbody>
+      </table>
+      <button class="button" type="submit" name="action" value="submit">Submit</button>
+  </form>
+  
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <ul class="flashes">
+    {% for message in messages %}
+    <li>{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% endwith %}
+      
+
+  </body>
+</html>
