@@ -239,7 +239,7 @@ def approveplot():
         else:
             flash('Please select at least one plot to approve.', 'warning')
    
-    return render_template('approve_plot.html', result=db.getApprovalList('plot'))
+    return render_template('approve_plot.html', result=db.getApprovalDict('plot'))
 
 
 @app.route('/inspector/approvedepot', methods=['GET', 'POST'])
@@ -252,15 +252,30 @@ def approvedepot():
             flash('Selected depots have been approved!', 'success')
         else:
             flash('Please select at least one depot to approve.', 'warning')
-    result = db.getApprovalList('depot')
+    result = db.getApprovalDict('depot')
     return render_template('approve_depot.html', result=result)
 
 
-@app.route('/incpector/approveproduct', methods=['GET', 'POST'])
+@app.route('/inspector/approveproduct', methods=['GET', 'POST'])
 def approveproduct():
 
-   return render_template('approve_plot.html', result = db.getApprovalList('product'))
+   return render_template('approve_plot.html', result = db.getApprovalDict('product'))
     # code for farmer's product page     
+
+
+@app.route('/inspector/approvetrade', methods=['GET', 'POST'])
+def approvetrade():
+    if request.method == 'POST':
+        request_ids = request.form.getlist('request_ids')
+        if request_ids:
+            for request_id in request_ids:
+                db.approve_trade_request(request_id)
+                db.update_trade()
+            flash('Selected trades have been approved!', 'success')
+        else:
+            flash('Please select at least one trade to approve.', 'warning')
+    result = db.get_trade_requests()
+    return render_template('approve_trade.html', trade=db.get_trade_readable(), result=result)
 
 
 

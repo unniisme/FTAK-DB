@@ -169,6 +169,12 @@ class FTAKdb(PostgresqlDB):
     def get_all_products(self):
         query = "SELECT * from product"
         return self.dql_to_dictList(query)
+
+    def get_trades(self):
+        return self.dql_to_dictList("SELECT * FROM trade")
+
+    def get_trade_readable(self):
+        return self.dql_to_dictList("SELECT * FROM trade_info")
     
     # DD DM
     def insert_farmer(self, first_name, last_name, DoB, DoJ, phone_number, address_id):
@@ -403,7 +409,7 @@ class INSPECTORdb(FTAKdb):
     def update_new_farmer_products(self):
         self.execute_ddl_and_dml_commands("SELECT insert_approved_products()")
 
-    def getApprovalList(self, tableName):
+    def getApprovalDict(self, tableName):
         """
         table names can be plot, depot, product, new_product
         """
@@ -429,7 +435,7 @@ class INSPECTORdb(FTAKdb):
         self.execute_ddl_and_dml_commands(query)
 
     def update_trade(self):
-        self.execute_ddl_and_dml_commands("SELECT insert_approved_trades()")
+        self.execute_ddl_and_dml_commands("CALL insert_approved_trades()")
 
 class FARMERdb(FTAKdb):
 

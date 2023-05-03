@@ -62,3 +62,11 @@ GRANT SELECT ON product TO Customer;
 GRANT SELECT ON address TO Customer;
 GRANT INSERT ON trade_request TO Customer;
 GRANT USAGE, SELECT ON trade_request_id_seq TO Customer;
+
+CREATE VIEW trade_info AS
+SELECT t.trade_id, f.first_name || ' ' || f.last_name as farmer_name, t.quantity, p.name as product_name, d.name as depot_name, t.unit_rate, t.rate, c.first_name || ' ' || c.last_name as customer_name, t.amount as total_amount
+FROM trade t JOIN farmer_product fp ON t.farmer_product_id = fp.farmer_product_id
+    JOIN farmer f ON f.farmer_id = fp.farmer_id
+    JOIN product p ON p.product_id = fp.product_id
+    JOIN depot d ON t.depot_id = d.depot_id
+    JOIN customer c ON c.customer_id = t.customer_id;
