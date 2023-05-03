@@ -96,8 +96,8 @@ CREATE TABLE city (
 );
 
 CREATE TABLE customer (
-  customer_id SERIAL,
-  customer_username VARCHAR(50) NOT NULL,
+  customer_id SERIAL UNIQUE,
+  customer_username VARCHAR(50) NOT NULL UNIQUE,
   first_name VARCHAR(50) NOT NULL,
   last_name VARCHAR(50) NOT NULL,
   email VARCHAR(100) NOT NULL,
@@ -189,11 +189,9 @@ CREATE TABLE trade_request (
   customer_id INT NOT NULL,
   product_id INT NOT NULL, 
   quantity INT NOT NULL,
-  depot_id INT NOT NULL,
 
   FOREIGN KEY (customer_id) REFERENCES customer (customer_id),
   FOREIGN KEY (product_id) REFERENCES product (product_id),
-  FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
 
   approved BOOLEAN NOT NULL,
   entry_time timestamp

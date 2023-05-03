@@ -124,6 +124,15 @@ def customer_signup():
 
     return render_template('signup_customer.html')
 
+@app.route('/customer', methods=['POST', 'GET'])
+def customer():
+
+    if request.method == "POST":
+        db.insert_trade_request(request.form["product"], request.form["quantity"])
+
+    return render_template('customer.html', products = db.get_products())
+
+
 @app.route('/farmer',methods=['POST', "GET"])
 def farmer():
     try:

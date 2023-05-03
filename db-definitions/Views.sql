@@ -61,3 +61,4 @@ GRANT SELECT ON depot TO Customer;
 GRANT SELECT ON product TO Customer;
 GRANT SELECT ON address TO Customer;
 GRANT INSERT ON trade_request TO Customer;
+GRANT USAGE, SELECT ON trade_request_id_seq TO Customer;

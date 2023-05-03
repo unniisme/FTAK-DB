@@ -269,7 +269,7 @@ class FTAKdb(PostgresqlDB):
             print("unknown username")
             return None
 
-        customer_id = db.dql_output_to_dictList(f"SELECT customer_id FROM customer WHERE customer_username='{username}'")[0]['customer_id']
+        customer_id = db.dql_to_dictList(f"SELECT customer_id FROM customer WHERE customer_username='{username}'")[0]['customer_id']
 
         db = CUSTOMERdb(username, password, host, port)
 
@@ -503,8 +503,8 @@ class CUSTOMERdb(FTAKdb):
 
         
     # DD DM
-    def insert_trade_request(self, product_id, quantity, depot_id):
-        query = f"INSERT INTO trade_request (customer_id, product_id, quantity, depot_id, approved, entry_time) \
-            VALUES ({self.customer_id}, {product_id}, {quantity}, {depot_id}, FALSE, NOW())"
+    def insert_trade_request(self, product_id, quantity):
+        query = f"INSERT INTO trade_request (customer_id, product_id, quantity, approved, entry_time) \
+            VALUES ({self.customer_id}, {product_id}, {quantity}, FALSE, NOW())"
         self.execute_ddl_and_dml_commands(query)
     
