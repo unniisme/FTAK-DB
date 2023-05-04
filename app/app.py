@@ -218,6 +218,8 @@ def inspector():
                 return redirect(url_for('approvedepot'))
             elif request.form['action'] == 'product':
                 return redirect(url_for('approveproduct'))
+            elif request.form['action'] == 'trade':
+                return redirect(url_for('approvetrade'))
             elif request.form['action'] == 'query':
                 return redirect(url_for('query',query = request.form['query']))
 
@@ -268,10 +270,14 @@ def approvetrade():
     if request.method == 'POST':
         request_ids = request.form.getlist('request_ids')
         if request_ids:
-            for request_id in request_ids:
-                db.approve_trade_request(request_id)
-                db.update_trade()
-            flash('Selected trades have been approved!', 'success')
+           
+                for request_id in request_ids:
+                    try:
+                        db.approve_trade_request(request_id)
+                        db.update_trade()
+                        flash('Selected trades have been approved!', 'success')
+                    except Exception as e:
+                        flash(e,'failure')
         else:
             flash('Please select at least one trade to approve.', 'warning')
     result = db.get_trade_requests()
