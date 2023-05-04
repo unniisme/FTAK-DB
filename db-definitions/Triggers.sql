@@ -36,8 +36,13 @@ CREATE TRIGGER approve_farmer_depot_trigger
 CREATE OR REPLACE FUNCTION approve_farmer_product_requests() RETURNS TRIGGER AS $$ 
 BEGIN
   IF NEW.approved THEN
-    INSERT INTO farmer_product (farmer_id, product_id, quantity, depot_id)
-    VALUES (NEW.farmer_id, NEW.product_id, NEW.quantity, NEW.depot_id);
+    IF EXISTS (SELECT * FROM farmer_depot WHERE farmer_id = NEW.farmer_id AND depot_id = NEW.depot_id) THEN
+        INSERT INTO farmer_product (farmer_id, product_id, quantity, depot_id)
+        VALUES (NEW.farmer_id, NEW.product_id, NEW.quantity, NEW.depot_id);
+    ELSE
+        RAISE EXCEPTION 'Farmer-depot combination is not valid.';
+        UPDATE farmer_product_approval SET approved = FALSE WHERE id = NEW.id;
+    END IF;
   END IF;
   RETURN NEW;
 END;

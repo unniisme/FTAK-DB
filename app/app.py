@@ -261,9 +261,16 @@ def approvedepot():
 @app.route('/inspector/approveproduct', methods=['GET', 'POST'])
 def approveproduct():
 
-   return render_template('approve_plot.html', result = db.getApprovalDict('product'))
-    # code for farmer's product page     
-
+    if request.method == 'POST':
+        product_ids = request.form.getlist('product_ids')
+        if product_ids:
+            for product_id in product_ids:
+                db.approve_farmer_product(product_id)
+            flash('Selected products have been approved!', 'success')
+        else:
+            flash('Please select at least one product to approve.', 'warning')
+    
+    return render_template('approve_product.html', result = db.getApprovalDict('product'))
 
 @app.route('/inspector/approvetrade', methods=['GET', 'POST'])
 def approvetrade():

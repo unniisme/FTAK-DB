@@ -313,12 +313,13 @@ class FTAKdb(PostgresqlDB):
                     FROM farmer f \
                     LEFT JOIN farmer_plot fpl ON fpl.farmer_id = f.farmer_id \
                     LEFT JOIN farmer_product fp ON fp.farmer_id = f.farmer_id \
-                    LEFT JOIN farmer_depot df ON fd.farmer_id = f.farmer_id \
+                    LEFT JOIN farmer_depot fd ON fd.farmer_id = f.farmer_id \
                     WHERE f.farmer_id = {new_farmer_id}"
                 connection.execute(text(view_query))
                 print("Created view")
 
                 # Access all information about the requests that you have made
+                # Not used right now
                 request_view_query=f"CREATE VIEW {username}_requests AS \
                     SELECT fpla.*, fda.*, fpra.*\
                     FROM farmer \
@@ -459,7 +460,7 @@ class FARMERdb(FTAKdb):
         return self.dql_to_dictList(query)
 
     def get_products(self):
-        query = f"SELECT p.product_id, p.name, p.description, p.rate, p.image_link FROM {self.farmer_info_view} as i LEFT JOIN product as p ON i.product_id = p.product_id"
+        query = f"SELECT p.product_id, p.name, p.description, p.rate, p.image_link, i.quantity FROM {self.farmer_info_view} as i LEFT JOIN product as p ON i.product_id = p.product_id"
         return self.dql_to_dictList(query)
         
 
