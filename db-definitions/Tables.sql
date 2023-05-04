@@ -1,7 +1,7 @@
 -- Table definitions
 -- DB name is ftak
 
-CREATE DATABASE ftak;
+-- CREATE DATABASE ftak;
 
 CREATE TABLE farmer (
   farmer_id SERIAL,
@@ -114,7 +114,6 @@ ALTER TABLE farmer_depot ADD CONSTRAINT farmer_fk FOREIGN KEY (farmer_id) REFERE
 ALTER TABLE farmer_depot ADD CONSTRAINT depot_fk FOREIGN KEY (depot_id) REFERENCES depot (depot_id);
 ALTER TABLE trade ADD CONSTRAINT fp_fk FOREIGN KEY (farmer_product_id) REFERENCES farmer_product (farmer_product_id);
 ALTER TABLE trade ADD CONSTRAINT depot_fk FOREIGN KEY (depot_id) REFERENCES depot (depot_id);
-ALTER TABLE trade ADD CONSTRAINT pr_fk FOREIGN KEY (rate) REFERENCES product (rate);
 ALTER TABLE address ADD CONSTRAINT city_fk FOREIGN KEY (city_id) REFERENCES city (city_id);
 ALTER TABLE address ADD CONSTRAINT country_fk FOREIGN KEY (country_id) REFERENCES country (country_id);
 ALTER TABLE city ADD CONSTRAINT country_fk FOREIGN KEY (country_id) REFERENCES country (country_id);

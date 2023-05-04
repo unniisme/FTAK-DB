@@ -30,13 +30,14 @@ CREATE USER Supervisor;
 
 
 --Create views for Supervisor
-CREATE VIEW full_trade_data AS
-SELECT trade.trade_id, farmer.first_name, farmer.last_name, product.name, trade.quantity, depot.name AS depot_name, trade.unit_rate, trade.rate
-FROM trade
-JOIN farmer_product ON trade.farmer_product_id = farmer_product.farmer_product_id
-JOIN farmer ON farmer_product.farmer_id = farmer.farmer_id
-JOIN depot ON trade.depot_id = depot.depot_id
-JOIN product ON farmer_product.product_id = product.product_id;
+CREATE VIEW trade_info AS
+SELECT t.trade_id, f.first_name || ' ' || f.last_name as farmer_name, t.quantity, p.name as product_name, d.name as depot_name, t.unit_rate, t.rate, c.first_name || ' ' || c.last_name as customer_name, t.amount as total_amount
+FROM trade t JOIN farmer_product fp ON t.farmer_product_id = fp.farmer_product_id
+    JOIN farmer f ON f.farmer_id = fp.farmer_id
+    JOIN product p ON p.product_id = fp.product_id
+    JOIN depot d ON t.depot_id = d.depot_id
+    JOIN customer c ON c.customer_id = t.customer_id;
+
 
 CREATE VIEW farmer_depot_info AS
 SELECT farmer.first_name, farmer.last_name, depot.name, address.street_name, address.street_number, address.postal_code, city.name AS city_name, country.name AS country_name
@@ -47,7 +48,7 @@ JOIN address ON depot.address_id = address.address_id
 JOIN city ON address.city_id = city.city_id
 JOIN country ON address.country_id = country.country_id;
 
-GRANT SELECT ON full_trade_data TO Supervisor;
+GRANT SELECT ON trade_info TO Supervisor;
 GRANT SELECT ON farmer_depot_info TO Supervisor;
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO supervisor;
@@ -62,11 +63,3 @@ GRANT SELECT ON product TO Customer;
 GRANT SELECT ON address TO Customer;
 GRANT INSERT ON trade_request TO Customer;
 GRANT USAGE, SELECT ON trade_request_id_seq TO Customer;
-
-CREATE VIEW trade_info AS
-SELECT t.trade_id, f.first_name || ' ' || f.last_name as farmer_name, t.quantity, p.name as product_name, d.name as depot_name, t.unit_rate, t.rate, c.first_name || ' ' || c.last_name as customer_name, t.amount as total_amount
-FROM trade t JOIN farmer_product fp ON t.farmer_product_id = fp.farmer_product_id
-    JOIN farmer f ON f.farmer_id = fp.farmer_id
-    JOIN product p ON p.product_id = fp.product_id
-    JOIN depot d ON t.depot_id = d.depot_id
-    JOIN customer c ON c.customer_id = t.customer_id;
