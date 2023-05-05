@@ -1,6 +1,7 @@
 import sqlalchemy
 from sqlalchemy.engine import create_engine
 from sqlalchemy.sql import text
+import psycopg2
 
 admin_username = "postgres"
 admin_password = "postgres" #Suppose to be hidden
@@ -424,14 +425,15 @@ class INSPECTORdb(FTAKdb):
 
         self.execute_ddl_and_dml_commands(query)
 
-    def update_new_farmer_products(self):
-        self.execute_ddl_and_dml_commands("SELECT insert_approved_products()")
+        self.execute_ddl_and_dml_commands("CALL insert_approved_products()")
+
+        return len(self.execute_ddl_and_dml_commands(f"SELECT * FROM new_product_approval WHERE id = {entry_id}")) == 0
 
     def getApprovalDict(self, tableName):
         """
         table names can be plot, depot, product, new_product
         """
-        if tableName not in ["plot", "depot", "product"]:
+        if tableName not in ["plot", "depot", "product", "new_product"]:
             print("Unknown table")
             return -1
 
@@ -451,9 +453,9 @@ class INSPECTORdb(FTAKdb):
         query = f"UPDATE trade_request SET approved = TRUE WHERE id = {request_id}"
 
         self.execute_ddl_and_dml_commands(query)
-
-    def update_trade(self):
         self.execute_ddl_and_dml_commands("CALL insert_approved_trades()")
+
+        return len(self.dql_to_dictList(f"SELECT * FROM trade_request WHERE id = {request_id} AND approved = FALSE")) == 0
 
 class FARMERdb(FTAKdb):
 
@@ -468,16 +470,16 @@ class FARMERdb(FTAKdb):
         return self.dql_to_dictList(f"SELECT farmer_id, first_name, last_name, dob, doj, phone_number, address_id FROM {self.farmer_info_view};")[0]
 
     def get_depots(self):
-        query = f"SELECT i.depot_id, depot.name, depot.address_id  FROM {self.farmer_info_view} as i LEFT JOIN depot ON i.depot_id = depot.depot_id"
+        query = f"SELECT DISTINCT i.depot_id, depot.name, depot.address_id  FROM {self.farmer_info_view} as i LEFT JOIN depot ON i.depot_id = depot.depot_id"
 
         return self.dql_to_dictList(query)
 
     def get_plots(self):
-        query = f"SELECT plot_id, plot_size, longitude, latitude FROM {self.farmer_info_view}"
+        query = f"SELECT DISTINCT plot_id, plot_size, longitude, latitude FROM {self.farmer_info_view}"
         return self.dql_to_dictList(query)
 
     def get_products(self):
-        query = f"SELECT p.product_id, p.name, p.description, p.rate, p.image_link, i.quantity FROM {self.farmer_info_view} as i LEFT JOIN product as p ON i.product_id = p.product_id"
+        query = f"SELECT DISTINCT p.product_id, p.name, p.description, p.rate, p.image_link, i.quantity FROM {self.farmer_info_view} as i LEFT JOIN product as p ON i.product_id = p.product_id"
         return self.dql_to_dictList(query)
         
 
@@ -498,8 +500,8 @@ class FARMERdb(FTAKdb):
         self.execute_ddl_and_dml_commands(query)
 
     def insert_new_product_request(self, product_name, description, rate, image_link, quantity, depot_id):
-        query = f"INSERT INTO new_product_approval (farmer_id, name, description, rate, image_link, approved, entry_time) \
-                VALUES ({self.get_details()['farmer_id']}, '{product_name}', '{description}', {rate}, {image_link}, FALSE, NOW());"
+        query = f"INSERT INTO new_product_approval (farmer_id, name, description, rate, image_link, quantity, depot_id, approved, entry_time) \
+                VALUES ({self.get_details()['farmer_id']}, '{product_name}', '{description}', {rate}, '{image_link}', {quantity}, {depot_id}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
 
 

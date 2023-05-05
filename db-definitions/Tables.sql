@@ -172,12 +172,17 @@ CREATE TABLE farmer_product_approval (
 CREATE TABLE new_product_approval (
   id SERIAL PRIMARY KEY,
 
-  farmer_id INT NOT NULL,  --Only for verification
+  farmer_id INT NOT NULL, 
   name VARCHAR(100) NOT NULL,
   description TEXT,
   rate DECIMAL(10,2) NOT NULL,
-  image_link VARCHAR(50),
+  image_link VARCHAR,
+
+  quantity INT NOT NULL,
+  depot_id INT NOT NULL,
+
   FOREIGN KEY (farmer_id) REFERENCES farmer (farmer_id),
+  FOREIGN KEY (depot_id) REFERENCES depot (depot_id),
 
   approved BOOLEAN NOT NULL,
   entry_time timestamp
