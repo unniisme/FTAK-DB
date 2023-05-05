@@ -207,7 +207,7 @@ def product():
                 
     products = dbs[request.remote_addr].get_all_products()
     depots = dbs[request.remote_addr].get_all_depots()
-    return render_template('product.html',result = dbs[request.remote_addr].get_products(),products = products, depots = depots)
+    return render_template('product.html',result = dbs[request.remote_addr].get_products(),products = products, depots = dbs[request.remote_addr].get_depots())
     # code for farmer's product page     
 
 
