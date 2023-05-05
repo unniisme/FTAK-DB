@@ -12,6 +12,9 @@ PASSWORD = 'postgres'
 PORT = 5432
 HOST = 'localhost'
 
+# Dbs login for each user
+dbs = {}
+
 #Initializing SqlAlchemy Postgresql Db Instance
 db = FTAKdb(user_name=USER_NAME,
                     password=PASSWORD,
@@ -42,13 +45,13 @@ def login():
         password = request.form['password']
 
         if client == "farmer":
-            db = FTAKdb.farmer_login(username, password, HOST, PORT)
+            dbs[request.remote_addr] = FTAKdb.farmer_login(username, password, HOST, PORT)
         elif client == "inspector":
-            db = FTAKdb.inspector_login(username, password, HOST, PORT)
+            dbs[request.remote_addr] = FTAKdb.inspector_login(username, password, HOST, PORT)
         elif client == "customer":
-            db = FTAKdb.customer_login(username, password, HOST, PORT)
+            dbs[request.remote_addr] = FTAKdb.customer_login(username, password, HOST, PORT)
             
-        if db==None:
+        if dbs[request.remote_addr]==None:
             print("Unknown username or password")
         else:
             return redirect(url_for(client))
@@ -128,15 +131,15 @@ def customer_signup():
 def customer():
 
     if request.method == "POST":
-        db.insert_trade_request(request.form["product"], request.form["quantity"])
+        dbs[request.remote_addr].insert_trade_request(request.form["product"], request.form["quantity"])
 
-    return render_template('customer.html', products = db.get_products())
+    return render_template('customer.html', products = dbs[request.remote_addr].get_products())
 
 
 @app.route('/farmer',methods=['POST', "GET"])
 def farmer():
     try:
-        farmer_data = db.get_details()
+        farmer_data = dbs[request.remote_addr].get_details()
         name = farmer_data['first_name'] + " " + farmer_data['last_name']
         phonenumber = farmer_data['phone_number']
         farmerid = farmer_data['farmer_id']
@@ -151,7 +154,7 @@ def farmer():
             elif request.form['action'] == 'query':
                 return redirect(url_for('query',query = request.form['query']))
 
-        return render_template('farmer.html', username = db.user_name, name = name, phone_number = phonenumber,farmer_id = farmerid)
+        return render_template('farmer.html', username = dbs[request.remote_addr].user_name, name = name, phone_number = phonenumber,farmer_id = farmerid)
         
     except:
         return "Not logged in"     
@@ -161,7 +164,7 @@ def query():
     query = request.args.get('query')
 
     try:
-        result = db.dql_to_dictList(query)
+        result = dbs[request.remote_addr].dql_to_dictList(query)
         return render_template('query.html', query = query, result = result)
     except Exception as e:
         return str(e)
@@ -170,9 +173,9 @@ def query():
 def plot():
     
     if request.method == "POST":
-        db.insert_plot_request(request.form['plot_size'], request.form['longitude'], request.form['latitude'])
+        dbs[request.remote_addr].insert_plot_request(request.form['plot_size'], request.form['longitude'], request.form['latitude'])
 
-    return render_template('plot.html', result = db.get_plots())
+    return render_template('plot.html', result = dbs[request.remote_addr].get_plots())
 
 
 @app.route('/farmer/depot', methods=['GET', 'POST'])
@@ -180,10 +183,10 @@ def depot():
 
     if request.method == "POST":
         
-        db.insert_depot_request(request.form['depot'])
+        dbs[request.remote_addr].insert_depot_request(request.form['depot'])
 
-    depots = db.get_all_depots()
-    return render_template('depot.html',result = db.get_depots(),depots = depots)
+    depots = dbs[request.remote_addr].get_all_depots()
+    return render_template('depot.html',result = dbs[request.remote_addr].get_depots(),depots = depots)
 
 
 @app.route('/farmer/product', methods=['GET', 'POST'])
@@ -193,18 +196,18 @@ def product():
         if request.form['product'] == 'newProduct':
             product_id = request.form['product_name']
             description =  request.form['description']
-            db.insert_new_product_request(product_id,description, request.form['rate'], request.form['image_link'],request.form['quantity'], request.form['depot_id'])
+            dbs[request.remote_addr].insert_new_product_request(product_id,description, request.form['rate'], request.form['image_link'],request.form['quantity'], request.form['depot_id'])
         else:
             product_id = request.form['product']
             quantity = request.form['quantity']
             depot = request.form['depot_id']
             print("product id="+str(product_id))
             print("depot_id="+str(depot))
-            db.insert_product_request(product_id, quantity, depot)
+            dbs[request.remote_addr].insert_product_request(product_id, quantity, depot)
                 
-    products = db.get_all_products()
-    depots = db.get_all_depots()
-    return render_template('product.html',result = db.get_products(),products = products, depots = depots)
+    products = dbs[request.remote_addr].get_all_products()
+    depots = dbs[request.remote_addr].get_all_depots()
+    return render_template('product.html',result = dbs[request.remote_addr].get_products(),products = products, depots = depots)
     # code for farmer's product page     
 
 
@@ -223,7 +226,7 @@ def inspector():
             elif request.form['action'] == 'query':
                 return redirect(url_for('query',query = request.form['query']))
 
-        return render_template('inspector.html', username = db.user_name)
+        return render_template('inspector.html', username = dbs[request.remote_addr].user_name)
         
     except:
         return "Not logged in"     
@@ -236,12 +239,12 @@ def approveplot():
         if plot_ids:
         # plot_ids is a list of plot IDs that were checked
             for plot_id in plot_ids:
-                db.approve_farmer_plot(plot_id)
+                dbs[request.remote_addr].approve_farmer_plot(plot_id)
             flash('Selected plots have been approved!', 'success')
         else:
             flash('Please select at least one plot to approve.', 'warning')
    
-    return render_template('approve_plot.html', result=db.getApprovalDict('plot'))
+    return render_template('approve_plot.html', result=dbs[request.remote_addr].getApprovalDict('plot'))
 
 
 @app.route('/inspector/approvedepot', methods=['GET', 'POST'])
@@ -250,11 +253,11 @@ def approvedepot():
         depot_ids = request.form.getlist('depot_ids')
         if depot_ids:
             for depot_id in depot_ids:
-                db.approve_farmer_depot(depot_id)
+                dbs[request.remote_addr].approve_farmer_depot(depot_id)
             flash('Selected depots have been approved!', 'success')
         else:
             flash('Please select at least one depot to approve.', 'warning')
-    result = db.getApprovalDict('depot')
+    result = dbs[request.remote_addr].getApprovalDict('depot')
     return render_template('approve_depot.html', result=result)
 
 
@@ -265,12 +268,12 @@ def approveproduct():
         product_ids = request.form.getlist('product_ids')
         if product_ids:
             for product_id in product_ids:
-                db.approve_farmer_product(product_id)
+                dbs[request.remote_addr].approve_farmer_product(product_id)
             flash('Selected products have been approved!', 'success')
         else:
             flash('Please select at least one product to approve.', 'warning')
     
-    return render_template('approve_product.html', result = db.getApprovalDict('product'))
+    return render_template('approve_product.html', result = dbs[request.remote_addr].getApprovalDict('product'))
 
 @app.route('/inspector/approvetrade', methods=['GET', 'POST'])
 def approvetrade():
@@ -280,15 +283,15 @@ def approvetrade():
            
                 for request_id in request_ids:
                     try:
-                        db.approve_trade_request(request_id)
-                        db.update_trade()
+                        dbs[request.remote_addr].approve_trade_request(request_id)
+                        dbs[request.remote_addr].update_trade()
                         flash('Selected trades have been approved!', 'success')
                     except Exception as e:
                         flash(e,'failure')
         else:
             flash('Please select at least one trade to approve.', 'warning')
-    result = db.get_trade_requests()
-    return render_template('approve_trade.html', trade=db.get_trade_readable(), result=result)
+    result = dbs[request.remote_addr].get_trade_requests()
+    return render_template('approve_trade.html', trade=dbs[request.remote_addr].get_trade_readable(), result=result)
 
 
 

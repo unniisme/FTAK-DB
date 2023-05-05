@@ -20,7 +20,7 @@ RETURNS INT AS $$
 DECLARE
   suitable_farmer_product_id INT;
 BEGIN
-  SELECT farmer_product_id FROM farmer_product fp WHERE fp.product_id = _product_id AND fp.quantity >= _quantity ORDER BY fp.quantity ASC LIMIT 1 INTO suitable_farmer_product_id;
+  SELECT farmer_product_id FROM farmer_product fp WHERE fp.product_id = _product_id AND fp.quantity >= _quantity ORDER BY fp.quantity DESC LIMIT 1 INTO suitable_farmer_product_id;
   RETURN suitable_farmer_product_id;
 END;
 $$ LANGUAGE plpgsql;

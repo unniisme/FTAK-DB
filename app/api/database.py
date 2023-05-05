@@ -187,12 +187,22 @@ class FTAKdb(PostgresqlDB):
         # Return ID
         return self.dql_to_dictList(f"SELECT farmer_id FROM farmer WHERE first_name='{first_name}' AND last_name='{last_name}' AND phone_number='{phone_number}'")[0]['farmer_id']
 
+    def delete_farmer(self, farmer_id):
+        query = f"DELETE FROM farmer WHERE farmer_id = {farmer_id}"
+
+        self.execute_ddl_and_dml_commands(query)
+
     def insert_customer(self, username, first_name, last_name, email,phone_number):
         query=f"INSERT INTO customer(customer_username,first_name, last_name, email, phone_number) \
             VALUES ('{username}','{first_name}', '{last_name}', '{email}', {phone_number})"
 
         self.execute_ddl_and_dml_commands(query)
         print("Inserted customer")
+
+    def delete_customer(self, username):
+        query = f"DELETE FROM cutomer WHERE customer_username = {username}"
+
+        self.execute_ddl_and_dml_commands(query)
 
     def insert_address(self, country, city=None, street_name=None, street_number=None, postal_code=None):
         if city==None or len(self.dql_to_dictList(f"SELECT * FROM country WHERE name='{country}'")) == 0:
@@ -341,6 +351,7 @@ class FTAKdb(PostgresqlDB):
 
             except Exception as e:
                 trans.rollback()
+                self.delete_farmer(new_farmer_id)
                 print("Rolling Back")
                 print(e)
 
@@ -358,7 +369,7 @@ class FTAKdb(PostgresqlDB):
                 connection.execute(text(role_query))
                 print("Created role", username)
 
-                new_customer_id = self.insert_customer(username, first_name, last_name, email, phone_number) #to do insert customer
+                self.insert_customer(username, first_name, last_name, email, phone_number) #to do insert customer
 
                 permissions_query=f"GRANT Customer TO {username}"
                 connection.execute(text(permissions_query))
@@ -371,6 +382,7 @@ class FTAKdb(PostgresqlDB):
 
             except Exception as e:
                 trans.rollback()
+                self.delete_customer(username)
                 print("Rolling Back")
                 print(e)
 
