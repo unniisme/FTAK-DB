@@ -131,7 +131,10 @@ def customer_signup():
 def customer():
 
     if request.method == "POST":
-        dbs[request.remote_addr].insert_trade_request(request.form["product"], request.form["quantity"])
+        # if request.form['action'] == 'viewRequests':
+            # Insert the code to return view; View given by {username}_requests
+        # else:
+            dbs[request.remote_addr].insert_trade_request(request.form["product"], request.form["quantity"])
 
     return render_template('customer.html', products = dbs[request.remote_addr].get_products())
 

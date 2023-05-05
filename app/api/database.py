@@ -375,6 +375,11 @@ class FTAKdb(PostgresqlDB):
                 connection.execute(text(permissions_query))
                 print("Granted permissions")
 
+                request_view_query=f"CREATE VIEW {username}_requests AS \
+                    SELECT *\
+                    FROM trade_request\
+                    WHERE trade_request.customer_id = customer.customer_id"
+
                 connection.execute(text("COMMIT;"))
                 connection.execute(text("END;"))
 
@@ -520,7 +525,10 @@ class CUSTOMERdb(FTAKdb):
         query = f"SELECT product_id, name, description, rate, image_link FROM product"
         return self.dql_to_dictList(query)
 
-        
+    def get_requests(self):
+        query = f"SELECT trade_request.product_id, product.name, trade_request.quantity FROM trade_request JOIN product ON trade_request.product_id = product.product_id"
+        return self.dql_to_dictList(query)
+
     # DD DM
     def insert_trade_request(self, product_id, quantity):
         query = f"INSERT INTO trade_request (customer_id, product_id, quantity, approved, entry_time) \
