@@ -1,11 +1,20 @@
 -- Function and proceedure definitions
 
 --Add all approved new products
+--Note, this function only works if there is exactly 1 entry. So call it at each approval.
 CREATE OR REPLACE PROCEDURE insert_approved_products() AS 
 $$
+DECLARE
+  new_product_id INT;
 BEGIN
   INSERT INTO product (name, description, rate, image_link)
   SELECT name, description, rate, image_link
+  FROM new_product_approval
+  WHERE approved = TRUE
+  RETURNING product_id INTO new_product_id;
+  
+  INSERT INTO farmer_product_approval (farmer_id, product_id, quantity, depot_id, approved, entry_time)
+  SELECT farmer_id, new_product_id, quantity, depot_id, FALSE, entry_time
   FROM new_product_approval
   WHERE approved = TRUE;
 

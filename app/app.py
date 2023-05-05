@@ -194,9 +194,9 @@ def product():
 
     if request.method == "POST":
         if request.form['product'] == 'newProduct':
-            product_id = request.form['product_name']
+            product_name = request.form['product_name']
             description =  request.form['description']
-            dbs[request.remote_addr].insert_new_product_request(product_id,description, request.form['rate'], request.form['image_link'],request.form['quantity'], request.form['depot_id'])
+            dbs[request.remote_addr].insert_new_product_request(product_name, description, request.form['rate'], request.form['image_link'],request.form['quantity'], request.form['depot_id'])
         else:
             product_id = request.form['product']
             quantity = request.form['quantity']
@@ -266,14 +266,19 @@ def approveproduct():
 
     if request.method == 'POST':
         product_ids = request.form.getlist('product_ids')
-        if product_ids:
+        new_product_ids = request.form.getlist('new_product_ids')
+        if len(product_ids) > 0:
             for product_id in product_ids:
                 dbs[request.remote_addr].approve_farmer_product(product_id)
             flash('Selected products have been approved!', 'success')
+        elif len(new_product_ids) > 0:
+            for product_id in new_product_ids:
+                dbs[request.remote_addr].approve_new_farmer_product(product_id)
+            flash('Selected new products have been added!', 'success')
         else:
             flash('Please select at least one product to approve.', 'warning')
     
-    return render_template('approve_product.html', result = dbs[request.remote_addr].getApprovalDict('product'))
+    return render_template('approve_product.html', result = dbs[request.remote_addr].getApprovalDict('product'), new_product = dbs[request.remote_addr].getApprovalDict('new_product'))
 
 @app.route('/inspector/approvetrade', methods=['GET', 'POST'])
 def approvetrade():

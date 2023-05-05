@@ -17,6 +17,7 @@ CREATE USER Farmer;
 GRANT INSERT ON farmer_plot_approval TO Farmer;
 GRANT INSERT ON farmer_depot_approval TO Farmer;
 GRANT INSERT ON farmer_product_approval TO Farmer;
+GRANT INSERT ON new_product_approval TO Farmer;
 GRANT SELECT ON product TO Farmer;
 GRANT SELECT ON country TO Farmer;
 GRANT SELECT ON city TO Farmer;

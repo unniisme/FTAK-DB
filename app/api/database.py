@@ -418,15 +418,14 @@ class INSPECTORdb(FTAKdb):
         query = f"UPDATE new_product_approval SET approved = TRUE WHERE id = {entry_id}"
 
         self.execute_ddl_and_dml_commands(query)
-
-    def update_new_farmer_products(self):
-        self.execute_ddl_and_dml_commands("SELECT insert_approved_products()")
+        
+        self.execute_ddl_and_dml_commands("CALL insert_approved_products()")
 
     def getApprovalDict(self, tableName):
         """
         table names can be plot, depot, product, new_product
         """
-        if tableName not in ["plot", "depot", "product"]:
+        if tableName not in ["plot", "depot", "product", "new_product"]:
             print("Unknown table")
             return -1
 
@@ -493,8 +492,8 @@ class FARMERdb(FTAKdb):
         self.execute_ddl_and_dml_commands(query)
 
     def insert_new_product_request(self, product_name, description, rate, image_link, quantity, depot_id):
-        query = f"INSERT INTO new_product_approval (farmer_id, name, description, rate, image_link, approved, entry_time) \
-                VALUES ({self.get_details()['farmer_id']}, '{product_name}', '{description}', {rate}, {image_link}, FALSE, NOW());"
+        query = f"INSERT INTO new_product_approval (farmer_id, name, description, rate, image_link, quantity, depot_id, approved, entry_time) \
+                VALUES ({self.get_details()['farmer_id']}, '{product_name}', '{description}', {rate}, '{image_link}', {quantity}, {depot_id}, FALSE, NOW());"
         self.execute_ddl_and_dml_commands(query)
 
 
