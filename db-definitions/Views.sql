@@ -29,6 +29,8 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to Farmer;
 --Supervisor
 CREATE USER Supervisor;
 
+CREATE ROLE prasad LOGIN PASSWORD 'minister';
+GRANT Supervisor TO prasad;
 
 --Create views for Supervisor
 CREATE VIEW trade_info AS

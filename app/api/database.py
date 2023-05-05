@@ -1,6 +1,7 @@
 import sqlalchemy
 from sqlalchemy.engine import create_engine
 from sqlalchemy.sql import text
+import psycopg2
 
 admin_username = "postgres"
 admin_password = "postgres" #Suppose to be hidden
@@ -421,6 +422,8 @@ class INSPECTORdb(FTAKdb):
 
         self.execute_ddl_and_dml_commands("CALL insert_approved_products()")
 
+        return len(self.execute_ddl_and_dml_commands(f"SELECT * FROM new_product_approval WHERE id = {entry_id}")) == 0
+
     def getApprovalDict(self, tableName):
         """
         table names can be plot, depot, product, new_product
@@ -445,9 +448,9 @@ class INSPECTORdb(FTAKdb):
         query = f"UPDATE trade_request SET approved = TRUE WHERE id = {request_id}"
 
         self.execute_ddl_and_dml_commands(query)
-
-    def update_trade(self):
         self.execute_ddl_and_dml_commands("CALL insert_approved_trades()")
+
+        return len(self.dql_to_dictList(f"SELECT * FROM trade_request WHERE id = {request_id} AND approved = FALSE")) == 0
 
 class FARMERdb(FTAKdb):
 

@@ -288,9 +288,11 @@ def approvetrade():
            
                 for request_id in request_ids:
                     try:
-                        dbs[request.remote_addr].approve_trade_request(request_id)
-                        dbs[request.remote_addr].update_trade()
-                        flash('Selected trades have been approved!', 'success')
+                        flag = dbs[request.remote_addr].approve_trade_request(request_id)
+                        if(flag):
+                            flash('Selected trades have been approved!', 'success')
+                        else:
+                            flash('Could not find a suitable farmer for you :(')
                     except Exception as e:
                         flash(e,'failure')
         else:
