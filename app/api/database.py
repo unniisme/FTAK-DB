@@ -105,6 +105,8 @@ class FTAKdb(PostgresqlDB):
 
     def dql_to_dictList(self, query):
         result = self.execute_dql_commands(query)
+        if result == None:
+            return result
         return FTAKdb.dql_output_to_dictList(result)
 
     def dql_to_tupleList(self, query):
@@ -201,7 +203,7 @@ class FTAKdb(PostgresqlDB):
         print("Inserted customer")
 
     def delete_customer(self, username):
-        query = f"DELETE FROM customer WHERE customer_username = {username}"
+        query = f"DELETE FROM customer WHERE customer_username = '{username}'"
 
         self.execute_ddl_and_dml_commands(query)
 
@@ -372,17 +374,19 @@ class FTAKdb(PostgresqlDB):
 
                 self.insert_customer(username, first_name, last_name, email, phone_number) #to do insert customer
 
-                permissions_query=f"GRANT Customer TO {username}"
-                connection.execute(text(permissions_query))
-                print("Granted permissions")
 
                 request_view_query=f"CREATE VIEW {username}_requests AS \
-                    SELECT *\
-                    FROM trade_request\
-                    JOIN customer\
-                    ON trade_request.customer_id = customer.customer_id"
+                    SELECT p.name, p.rate, tr.quantity,  tr.approved, tr.entry_time\
+                    FROM trade_request tr NATURAL JOIN customer c NATURAL JOIN product p\
+                    WHERE c.customer_username = '{username}'"
                 
                 connection.execute(text(request_view_query))
+                print("Created view")
+
+                permissions_query=f"GRANT Customer TO {username}; \
+                    GRANT INSERT, SELECT on {username}_requests to {username}"
+                connection.execute(text(permissions_query))
+                print("Granted permissions")
 
                 connection.execute(text("COMMIT;"))
                 connection.execute(text("END;"))

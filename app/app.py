@@ -131,8 +131,10 @@ def customer_signup():
 def customer():
 
     if request.method == "POST":
-        if request.form['action'] == 'viewRequests':
+        if 'action' in request.form:
             req = dbs[request.remote_addr].get_requests()
+            if req == None:
+                return "No requests"
             return render_template('viewrequests.html', result = req)
             # Insert the code to return view; View given by {username}_requests
         else:
