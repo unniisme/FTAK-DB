@@ -201,7 +201,7 @@ class FTAKdb(PostgresqlDB):
         print("Inserted customer")
 
     def delete_customer(self, username):
-        query = f"DELETE FROM cutomer WHERE customer_username = {username}"
+        query = f"DELETE FROM customer WHERE customer_username = {username}"
 
         self.execute_ddl_and_dml_commands(query)
 
@@ -379,7 +379,10 @@ class FTAKdb(PostgresqlDB):
                 request_view_query=f"CREATE VIEW {username}_requests AS \
                     SELECT *\
                     FROM trade_request\
-                    WHERE trade_request.customer_id = customer.customer_id"
+                    JOIN customer\
+                    ON trade_request.customer_id = customer.customer_id"
+                
+                connection.execute(text(request_view_query))
 
                 connection.execute(text("COMMIT;"))
                 connection.execute(text("END;"))
@@ -528,7 +531,7 @@ class CUSTOMERdb(FTAKdb):
         return self.dql_to_dictList(query)
 
     def get_requests(self):
-        query = f"SELECT trade_request.product_id, product.name, trade_request.quantity FROM trade_request JOIN product ON trade_request.product_id = product.product_id"
+        query = f"SELECT * FROM {self.user_name}_requests"
         return self.dql_to_dictList(query)
 
     # DD DM
@@ -536,4 +539,6 @@ class CUSTOMERdb(FTAKdb):
         query = f"INSERT INTO trade_request (customer_id, product_id, quantity, approved, entry_time) \
             VALUES ({self.customer_id}, {product_id}, {quantity}, FALSE, NOW())"
         self.execute_ddl_and_dml_commands(query)
+
+    
     

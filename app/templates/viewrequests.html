@@ -1,0 +1,30 @@
+<link rel="stylesheet" href="{{ url_for('static',filename='css/query.css') }}">
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+
+
+<table>
+    <thead>
+      <tr>
+        {% for key in result[0].keys() %}
+        <th>{{ key }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in result %}
+      <tr>
+        {% for key, value in row.items() %}
+        <td>{{ value }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
