@@ -29,6 +29,8 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to Farmer;
 --Supervisor
 CREATE USER Supervisor;
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO supervisor;
+
 CREATE ROLE prasad LOGIN PASSWORD 'minister';
 GRANT Supervisor TO prasad;
 
@@ -53,9 +55,6 @@ JOIN country ON address.country_id = country.country_id;
 
 GRANT SELECT ON trade_info TO Supervisor;
 GRANT SELECT ON farmer_depot_info TO Supervisor;
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO supervisor;
-REVOKE INSERT, UPDATE, DELETE ON trade FROM supervisor;
 
 
 -- Customer
